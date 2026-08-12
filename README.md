@@ -44,19 +44,19 @@ npm run build
 > Below are labeled placeholder sections reserved for user interface screenshots during live Stellar Testnet testing and submission review.
 
 ### 1. Wallet Connected
-`[ PLACEHOLDER: Screenshot of Freighter Wallet Connected State (Displaying Public Address & Testnet Network Badge) ]`
+![Wallet Connected](./walletconnect.png)
 
 ---
 
 ### 2. Balance Displayed
-`[ PLACEHOLDER: Screenshot of Header displaying Testnet XLM Balance (e.g., 10,000.00 XLM) ]`
+![Balance Displayed](./balance.png)
 
 ---
 
 ### 3. Successful Testnet Transaction
-`[ PLACEHOLDER: Screenshot of Successful Bounty Box Creation or Claim Modal in Action ]`
+![Successful Testnet Transaction](./walletdialog.png)
 
 ---
 
 ### 4. Transaction Result / Hash
-`[ PLACEHOLDER: Screenshot displaying raw Transaction Hash (e.g. e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855) linked to Stellar Expert Explorer ]`
+![Transaction Result / Hash](./transaction.png)
