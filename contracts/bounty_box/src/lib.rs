@@ -1,6 +1,6 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, token, Address, BytesN, Env, String,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, BytesN, Env, String,
 };
 
 #[contracterror]
@@ -45,6 +45,9 @@ impl BountyBoxContract {
         // Transfer funds from creator to the contract address
         let token_client = token::Client::new(&env, &token);
         token_client.transfer(&creator, &env.current_contract_address(), &amount);
+
+        // Emit Created event
+        env.events().publish((symbol_short!("Created"), creator.clone()), amount);
 
         env.storage().instance().set(&DataKey::BountyHash, &secret_hash);
         env.storage().instance().set(&DataKey::BountyCreator, &creator);
@@ -110,6 +113,9 @@ impl BountyBoxContract {
 
         let token_client = token::Client::new(&env, &token);
         token_client.transfer(&env.current_contract_address(), &solver, &amount);
+
+        // Emit Claimed event
+        env.events().publish((symbol_short!("Claimed"), solver.clone()), amount);
 
         env.storage().instance().set(&DataKey::Claimed, &true);
 

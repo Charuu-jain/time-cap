@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox } from 'lucide-react';
+import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
 import { hashSecret } from '../utils';
 import { submitClaimBounty } from '../soroban';
+import { useWallet } from '../WalletContext';
 
 interface ExploreVaultsProps {
   bounties: BountyBox[];
-  walletAddress: string | null;
   onClaimSuccess: (bountyId: string, solverAddress: string) => void;
 }
 
 export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
   bounties: initialBountiesFromProps,
-  walletAddress,
   onClaimSuccess,
 }) => {
+  const { walletAddress, signTx } = useWallet();
   const [bounties, setBounties] = useState<BountyBox[]>(initialBountiesFromProps);
 
   // Sync state when props change
@@ -41,6 +41,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
   const [selectedBounty, setSelectedBounty] = useState<BountyBox | null>(null);
   const [guess, setGuess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingStep, setPendingStep] = useState<string>('');
   const [statusMsg, setStatusMsg] = useState<{
     type: 'error' | 'info';
     text: string;
@@ -66,7 +67,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     e.preventDefault();
     if (!selectedBounty) return;
     if (!walletAddress) {
-      setStatusMsg({ type: 'error', text: 'Please connect your Freighter wallet to claim bounties!' });
+      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet via the Multi-Wallet modal to claim bounties!' });
       return;
     }
     if (!guess.trim()) {
@@ -75,7 +76,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     }
 
     setLoading(true);
-    setStatusMsg({ type: 'info', text: 'Verifying solution and submitting claim_bounty transaction...' });
+    setPendingStep('Verifying SHA-256 solution...');
+    setStatusMsg({ type: 'info', text: 'Verifying solution and preparing claim_bounty transaction...' });
 
     try {
       const computedHash = await hashSecret(guess.trim());
@@ -87,6 +89,11 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       const res = await submitClaimBounty({
         solverAddress: walletAddress,
         solutionStr: guess.trim(),
+        signTransactionFn: signTx,
+        onStatusUpdate: (stepText) => {
+          setPendingStep(stepText);
+          setStatusMsg({ type: 'info', text: stepText });
+        },
       });
       const txHash = res.txHash;
 
@@ -106,6 +113,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       });
     } finally {
       setLoading(false);
+      setPendingStep('');
     }
   };
 
@@ -305,9 +313,9 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                 className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
               >
                 {loading ? (
-                  <span className="flex items-center space-x-2 text-sm">
-                    <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                    <span>Invoking Soroban claim_bounty...</span>
+                  <span className="flex items-center space-x-2 text-xs font-mono">
+                    <RefreshCw className="w-4 h-4 text-indigo-300 animate-spin" />
+                    <span>{pendingStep || 'Invoking Soroban claim_bounty...'}</span>
                   </span>
                 ) : (
                   <>

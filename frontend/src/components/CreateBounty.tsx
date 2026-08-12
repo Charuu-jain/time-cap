@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { Lock, KeyRound, Coins, Sparkles, HelpCircle, ShieldAlert, ExternalLink } from 'lucide-react';
+import { Lock, KeyRound, Coins, Sparkles, HelpCircle, ShieldAlert, ExternalLink, RefreshCw } from 'lucide-react';
 import { hashSecret, CONTRACT_ID } from '../utils';
 import { submitCreateBounty } from '../soroban';
+import { useWallet } from '../WalletContext';
 import type { BountyBox } from '../types';
 
 interface CreateBountyProps {
-  walletAddress: string | null;
   onBountyCreated: (newBounty: BountyBox) => void;
 }
 
-export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBountyCreated }) => {
+export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) => {
+  const { walletAddress, signTx } = useWallet();
   const [title, setTitle] = useState('');
   const [secret, setSecret] = useState('');
   const [hint, setHint] = useState('');
   const [amount, setAmount] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingStep, setPendingStep] = useState<string>('');
   const [statusMsg, setStatusMsg] = useState<{
     type: 'success' | 'error' | 'info';
     text: string;
@@ -24,7 +26,7 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletAddress) {
-      setStatusMsg({ type: 'error', text: 'Please connect your Freighter wallet first!' });
+      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet via the Multi-Wallet modal first!' });
       return;
     }
     if (!title.trim() || !secret.trim() || !amount || Number(amount) <= 0) {
@@ -33,21 +35,23 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
     }
 
     setLoading(true);
+    setPendingStep('Computing SHA-256 state hash...');
     setStatusMsg({ type: 'info', text: 'Computing local Web Crypto SHA-256 hash...' });
 
     try {
       const secretHash = await hashSecret(secret.trim());
 
-      setStatusMsg({
-        type: 'info',
-        text: 'Simulating, signing & submitting create_bounty transaction to Soroban Testnet...',
-      });
-
       const res = await submitCreateBounty({
         creatorAddress: walletAddress,
         secretHash,
         amountXlm: amount.trim(),
+        signTransactionFn: signTx,
+        onStatusUpdate: (stepText) => {
+          setPendingStep(stepText);
+          setStatusMsg({ type: 'info', text: stepText });
+        },
       });
+
       const txHash = res.txHash;
 
       const newBounty: BountyBox = {
@@ -81,6 +85,7 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
       });
     } finally {
       setLoading(false);
+      setPendingStep('');
     }
   };
 
@@ -211,9 +216,9 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
             className="w-full mt-4 py-3.5 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
           >
             {loading ? (
-              <span className="flex items-center space-x-2">
-                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                <span>Locking Bounty Box on Soroban...</span>
+              <span className="flex items-center space-x-2 text-sm font-mono">
+                <RefreshCw className="w-4 h-4 text-indigo-300 animate-spin" />
+                <span>{pendingStep || 'Processing Soroban Transaction...'}</span>
               </span>
             ) : (
               <>

@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { isConnected, isAllowed, requestAccess, getAddress } from '@stellar/freighter-api';
 import { Navbar } from './components/Navbar';
 import { CreateBounty } from './components/CreateBounty';
 import { ExploreVaults } from './components/ExploreVaults';
+import { ActivityFeed } from './components/ActivityFeed';
+import { WalletProvider } from './WalletContext';
 import { INITIAL_BOUNTIES } from './utils';
 import type { BountyBox } from './types';
 import { Lock, Compass, ShieldCheck, Cpu } from 'lucide-react';
 
-export function App() {
+export function AppContent() {
   const [activeTab, setActiveTab] = useState<'create' | 'explore'>('explore');
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [balance, setBalance] = useState<string | null>(null);
   const [bounties, setBounties] = useState<BountyBox[]>(() => {
     const saved = localStorage.getItem('timecap_bounties');
     if (saved) {
@@ -26,70 +25,10 @@ export function App() {
     return INITIAL_BOUNTIES;
   });
 
-  // Restore Freighter wallet state on initial mount
-  useEffect(() => {
-    async function restoreWallet() {
-      try {
-        const connectionRes = await isConnected();
-        const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
-        if (connected) {
-          const allowedRes = await isAllowed();
-          const allowed = typeof allowedRes === 'boolean' ? allowedRes : allowedRes?.isAllowed;
-          if (allowed) {
-            const addrRes = await getAddress();
-            const address = typeof addrRes === 'string' ? addrRes : addrRes?.address;
-            if (address && !addrRes?.error) {
-              setWalletAddress(address);
-              setBalance('10,000.00');
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Error restoring wallet state on mount:', err);
-      }
-    }
-    restoreWallet();
-  }, []);
-
   // Sync bounties to localStorage on change
   useEffect(() => {
     localStorage.setItem('timecap_bounties', JSON.stringify(bounties));
   }, [bounties]);
-
-  const handleConnectWallet = async () => {
-    try {
-      const connectionRes = await isConnected();
-      const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
-      if (!connected) {
-        alert('Freighter wallet extension not found! Please install Freighter to connect.');
-        return;
-      }
-      const accessObj = await requestAccess();
-      const address = typeof accessObj === 'string' ? accessObj : accessObj?.address;
-      if (address && !accessObj?.error) {
-        setWalletAddress(address);
-        setBalance('10,000.00'); // Mocked balance for Testnet
-      } else {
-        const addrRes = await getAddress();
-        const fallbackAddr = typeof addrRes === 'string' ? addrRes : addrRes?.address;
-        if (fallbackAddr && !addrRes?.error) {
-          setWalletAddress(fallbackAddr);
-          setBalance('10,000.00');
-        }
-      }
-    } catch (err) {
-      console.warn('Freighter connection fallback:', err);
-      // Fallback demo address if Freighter is not actively installed in test env
-      const demoAddr = 'GCS3X7K9P2M4N6Q8R1T3V5W7Y9Z2A4B6C8D0E2F4G6H8';
-      setWalletAddress(demoAddr);
-      setBalance('5,000.00');
-    }
-  };
-
-  const handleDisconnectWallet = () => {
-    setWalletAddress(null);
-    setBalance(null);
-  };
 
   const handleBountyCreated = (newBounty: BountyBox) => {
     setBounties((prev) => [newBounty, ...prev]);
@@ -113,13 +52,7 @@ export function App() {
   return (
     <div className="min-h-screen bg-stellar-dark text-gray-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Navigation Header */}
-      <Navbar
-        walletAddress={walletAddress}
-        balance={balance}
-        isConnected={!!walletAddress}
-        onConnect={handleConnectWallet}
-        onDisconnect={handleDisconnectWallet}
-      />
+      <Navbar />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
@@ -129,13 +62,13 @@ export function App() {
 
           <div className="max-w-2xl relative z-10">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-mono font-medium mb-4">
-              <Cpu className="w-3.5 h-3.5" /> Powered by Soroban Smart Contracts
+              <Cpu className="w-3.5 h-3.5" /> Powered by Soroban Smart Contracts (Level 2 Yellow Belt)
             </span>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
               Cryptographic <span className="gradient-text">Time-Capsule</span> Bounty Box
             </h1>
             <p className="text-gray-300 text-base md:text-lg mb-6 leading-relaxed">
-              Create password-protected vaults with XLM bounties or solve cryptographic riddles on the Stellar Testnet. Verified zero-knowledge on-chain using SHA-256 state hashing.
+              Create password-protected vaults with XLM bounties or solve cryptographic riddles on the Stellar Testnet. Verified on-chain with contract events & multi-wallet kit.
             </p>
 
             {/* Quick stats */}
@@ -151,6 +84,9 @@ export function App() {
             </div>
           </div>
         </div>
+
+        {/* Real-Time Event Listening Activity Feed */}
+        <ActivityFeed />
 
         {/* Tab Navigation */}
         <div className="flex justify-center mb-8">
@@ -183,24 +119,26 @@ export function App() {
 
         {/* Tab Content */}
         {activeTab === 'create' ? (
-          <CreateBounty
-            walletAddress={walletAddress}
-            onBountyCreated={handleBountyCreated}
-          />
+          <CreateBounty onBountyCreated={handleBountyCreated} />
         ) : (
-          <ExploreVaults
-            bounties={bounties}
-            walletAddress={walletAddress}
-            onClaimSuccess={handleClaimSuccess}
-          />
+          <ExploreVaults bounties={bounties} onClaimSuccess={handleClaimSuccess} />
         )}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-stellar-border py-6 px-6 text-center text-xs text-gray-500 font-mono">
-        <p>Time-Capsule Bounty Box dApp • Built for Stellar Testnet Soroban • SHA-256 Vault Verification</p>
+        <p>Time-Capsule Bounty Box dApp • Built for Stellar Testnet Soroban • Level 2 Multi-Wallet & Event Streaming</p>
       </footer>
     </div>
   );
 }
+
+export function App() {
+  return (
+    <WalletProvider>
+      <AppContent />
+    </WalletProvider>
+  );
+}
+
 export default App;
