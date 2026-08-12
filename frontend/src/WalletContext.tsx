@@ -75,8 +75,9 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       localStorage.setItem('timecap_wallet_address', address);
       setIsModalOpen(false);
     } catch (err: any) {
-      console.error('Wallet Kit Connection Error:', err);
-      throw err;
+      const errorMsg = err?.message || (typeof err === 'string' ? err : 'Selected wallet module is not installed or available.');
+      console.warn('Wallet Kit Connection Error (handled):', errorMsg);
+      throw new Error(errorMsg);
     }
   };
 
