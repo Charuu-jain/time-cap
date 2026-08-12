@@ -62,3 +62,25 @@ npm run build
 
 ### 4. Transaction Result / Hash
 ![Transaction Result / Hash](./transaction.png)
+
+---
+
+## 🟡 Level 2 - Yellow Belt Certification
+
+- **Level 2 Deployed Contract ID**: `CBW7G2OLA2NB2LJNE2GG6M6BKLQNDKSFKX3OM3VBVDNCIZTRSMSY3VAI`
+
+### Multi-Wallet Selection Modal
+![Multi-Wallet Selection Modal](./multiwallet_modal.jpg)
+
+---
+
+### Live On-Chain Events Feed
+![Live On-Chain Events Feed](./activity_feed.jpg)
+
+---
+
+### Handled Error Scenarios
+- **Wallet Not Found / Not Installed**: Detected when a user attempts to interact without an available extension module.
+- **Transaction Rejected by User**: Explicitly caught and displayed when the user cancels or denies the signature prompt in their wallet.
+- **Insufficient XLM Balance**: Simulation errors and missing funds/unfunded account errors are cleanly caught and presented in the UI.
+
