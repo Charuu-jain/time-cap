@@ -57,8 +57,8 @@ export async function submitCreateBounty({
 
   // Construct ScVals matching Rust signature:
   // create_bounty(env, token: Address, creator: Address, secret_hash: BytesN<32>, amount: i128)
-  const tokenScVal = new Address(XLM_TOKEN_ID).toScVal();
-  const creatorScVal = new Address(creatorAddress).toScVal();
+  const tokenScVal = Address.fromString(XLM_TOKEN_ID).toScVal();
+  const creatorScVal = Address.fromString(creatorAddress).toScVal();
   const secretHashScVal = hexToBytesN32ScVal(secretHash);
   const amountScVal = nativeToScVal(amountStroops, { type: 'i128' });
 
@@ -118,7 +118,7 @@ export async function submitClaimBounty({
   const account = await server.getAccount(solverAddress);
   const contract = new Contract(CONTRACT_ID);
 
-  const solverScVal = new Address(solverAddress).toScVal();
+  const solverScVal = Address.fromString(solverAddress).toScVal();
   const solutionScVal = nativeToScVal(solutionStr, { type: 'string' });
 
   const op = contract.call('claim_bounty', solverScVal, solutionScVal);
