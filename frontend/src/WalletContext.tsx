@@ -40,17 +40,21 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     async function restoreConnection() {
-      const savedWalletId = localStorage.getItem('timecap_wallet_id');
-      const savedAddress = localStorage.getItem('timecap_wallet_address');
-      if (savedWalletId && savedAddress) {
-        try {
-          StellarWalletsKit.setWallet(savedWalletId);
-          setSelectedWalletId(savedWalletId);
-          setWalletAddress(savedAddress);
-          setBalance('10,000.00');
-        } catch (err) {
-          console.warn('Error restoring wallet connection:', err);
+      try {
+        const savedWalletId = localStorage.getItem('timecap_wallet_id');
+        const savedAddress = localStorage.getItem('timecap_wallet_address');
+        if (savedWalletId && savedAddress) {
+          try {
+            StellarWalletsKit.setWallet(savedWalletId);
+            setSelectedWalletId(savedWalletId);
+            setWalletAddress(savedAddress);
+            setBalance('10,000.00');
+          } catch (innerErr) {
+            console.warn('Silent wallet set failure:', innerErr);
+          }
         }
+      } catch (err) {
+        console.warn('Silent wallet restore error:', err);
       }
     }
     restoreConnection();

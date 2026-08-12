@@ -16,20 +16,31 @@ export const ActivityFeed: React.FC = () => {
   const [events, setEvents] = useState<OnChainEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastPolled, setLastPolled] = useState<string>('Just now');
+  const [currentStartLedger, setCurrentStartLedger] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     let isMounted = true;
 
     async function fetchEvents() {
       try {
+        let startLedgerToUse = currentStartLedger;
+
+        if (startLedgerToUse === undefined) {
+          const latestLedgerObj = await server.getLatestLedger();
+          startLedgerToUse = latestLedgerObj.sequence;
+          if (isMounted) {
+            setCurrentStartLedger(startLedgerToUse);
+          }
+        }
+
         const eventsRes = await server.getEvents({
+          startLedger: startLedgerToUse,
           filters: [
             {
               type: 'contract',
               contractIds: [CONTRACT_ID],
             },
           ],
-          cursor: '',
           limit: 10,
         });
 
@@ -53,7 +64,20 @@ export const ActivityFeed: React.FC = () => {
             };
           });
 
-          setEvents(parsedEvents);
+          if (parsedEvents.length > 0) {
+            const maxLedger = Math.max(...parsedEvents.map((e) => e.ledger));
+            if (maxLedger > 0) {
+              setCurrentStartLedger(maxLedger + 1);
+            }
+          }
+
+          setEvents((prev) => {
+            const combined = [...parsedEvents, ...prev];
+            // Deduplicate by ID
+            const unique = Array.from(new Map(combined.map((item) => [item.id, item])).values());
+            return unique.slice(0, 15);
+          });
+
           setLastPolled(new Date().toLocaleTimeString());
         }
       } catch (err) {
