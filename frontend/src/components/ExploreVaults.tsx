@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
-import { hashSecret, generateTxHash } from '../utils';
+import { hashSecret } from '../utils';
 import { submitClaimBounty } from '../soroban';
 
 interface ExploreVaultsProps {
@@ -84,17 +84,11 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
         throw new Error('Incorrect solution! The cryptographic hash does not match.');
       }
 
-      let txHash = '';
-      try {
-        const res = await submitClaimBounty({
-          solverAddress: walletAddress,
-          solutionStr: guess.trim(),
-        });
-        txHash = res.txHash;
-      } catch (blockchainErr: any) {
-        console.warn('Real Soroban claim fallback to mock tx hash:', blockchainErr);
-        txHash = generateTxHash();
-      }
+      const res = await submitClaimBounty({
+        solverAddress: walletAddress,
+        solutionStr: guess.trim(),
+      });
+      const txHash = res.txHash;
 
       onClaimSuccess(selectedBounty.id, walletAddress);
       setUnlockedModal({
@@ -106,11 +100,9 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       setGuess('');
       triggerConfetti();
     } catch (err: any) {
-      const failedTxHash = generateTxHash();
       setStatusMsg({
         type: 'error',
         text: err?.message || 'Failed to claim bounty box.',
-        txHash: failedTxHash,
       });
     } finally {
       setLoading(false);

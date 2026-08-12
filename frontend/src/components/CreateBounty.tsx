@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, KeyRound, Coins, Sparkles, HelpCircle, ShieldAlert, ExternalLink } from 'lucide-react';
-import { hashSecret, generateTxHash, CONTRACT_ID } from '../utils';
+import { hashSecret, CONTRACT_ID } from '../utils';
 import { submitCreateBounty } from '../soroban';
 import type { BountyBox } from '../types';
 
@@ -43,19 +43,12 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
         text: 'Simulating, signing & submitting create_bounty transaction to Soroban Testnet...',
       });
 
-      let txHash = '';
-      try {
-        const res = await submitCreateBounty({
-          creatorAddress: walletAddress,
-          secretHash,
-          amountXlm: amount.trim(),
-        });
-        txHash = res.txHash;
-      } catch (blockchainErr: any) {
-        console.warn('Real Soroban submission fallback to mock tx hash:', blockchainErr);
-        // Fallback tx hash if network RPC is unavailable in offline/mock environment
-        txHash = generateTxHash();
-      }
+      const res = await submitCreateBounty({
+        creatorAddress: walletAddress,
+        secretHash,
+        amountXlm: amount.trim(),
+      });
+      const txHash = res.txHash;
 
       const newBounty: BountyBox = {
         id: `bounty-${Date.now()}`,
@@ -82,11 +75,9 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ walletAddress, onBou
       setHint('');
       setAmount('');
     } catch (err: any) {
-      const failedTxHash = generateTxHash();
       setStatusMsg({
         type: 'error',
         text: err?.message || 'Failed to create bounty box transaction.',
-        txHash: failedTxHash,
       });
     } finally {
       setLoading(false);
