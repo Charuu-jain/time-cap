@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
 import { hashSecret, generateTxHash } from '../utils';
@@ -11,10 +11,31 @@ interface ExploreVaultsProps {
 }
 
 export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
-  bounties,
+  bounties: initialBountiesFromProps,
   walletAddress,
   onClaimSuccess,
 }) => {
+  const [bounties, setBounties] = useState<BountyBox[]>(initialBountiesFromProps);
+
+  // Sync state when props change
+  useEffect(() => {
+    setBounties(initialBountiesFromProps);
+  }, [initialBountiesFromProps]);
+
+  // Fetch and render list of active bounties from localStorage on initial mount
+  useEffect(() => {
+    const saved = localStorage.getItem('timecap_bounties');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBounties(parsed);
+        }
+      } catch (e) {
+        console.error('Error reading timecap_bounties from localStorage:', e);
+      }
+    }
+  }, []);
   const [selectedBounty, setSelectedBounty] = useState<BountyBox | null>(null);
   const [guess, setGuess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -118,14 +139,25 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       </div>
 
       {/* Grid of Vaults */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredBounties.map((bounty) => (
-          <div
-            key={bounty.id}
-            className={`glass-card rounded-2xl p-6 border relative flex flex-col justify-between overflow-hidden ${
-              bounty.claimed ? 'border-gray-800 opacity-75' : 'border-stellar-border'
-            }`}
-          >
+      {filteredBounties.length === 0 ? (
+        <div className="glass-card rounded-2xl p-12 text-center border border-stellar-border flex flex-col items-center justify-center my-8">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+            <Inbox className="w-8 h-8" />
+          </div>
+          <h3 className="text-xl font-bold text-white mb-2">No Active Bounty Vaults Found</h3>
+          <p className="text-sm text-gray-400 max-w-md mb-6">
+            There are currently no active time-capsule bounty boxes available. Create a new vault to lock XLM bounties!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredBounties.map((bounty) => (
+            <div
+              key={bounty.id}
+              className={`glass-card rounded-2xl p-6 border relative flex flex-col justify-between overflow-hidden ${
+                bounty.claimed ? 'border-gray-800 opacity-75' : 'border-stellar-border'
+              }`}
+            >
             {/* Header Badge */}
             <div className="flex items-center justify-between mb-4">
               <span
@@ -189,9 +221,10 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                 <span>Attempt Solution</span>
               </button>
             )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Claim Modal */}
       {selectedBounty && (

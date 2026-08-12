@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { isConnected, requestAccess, getAddress } from '@stellar/freighter-api';
+import { useState, useEffect } from 'react';
+import { isConnected, isAllowed, requestAccess, getAddress } from '@stellar/freighter-api';
 import { Navbar } from './components/Navbar';
 import { CreateBounty } from './components/CreateBounty';
 import { ExploreVaults } from './components/ExploreVaults';
@@ -11,23 +11,69 @@ export function App() {
   const [activeTab, setActiveTab] = useState<'create' | 'explore'>('explore');
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
-  const [bounties, setBounties] = useState<BountyBox[]>(INITIAL_BOUNTIES);
+  const [bounties, setBounties] = useState<BountyBox[]>(() => {
+    const saved = localStorage.getItem('timecap_bounties');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to parse saved bounties from localStorage:', e);
+      }
+    }
+    return INITIAL_BOUNTIES;
+  });
+
+  // Restore Freighter wallet state on initial mount
+  useEffect(() => {
+    async function restoreWallet() {
+      try {
+        const connectionRes = await isConnected();
+        const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
+        if (connected) {
+          const allowedRes = await isAllowed();
+          const allowed = typeof allowedRes === 'boolean' ? allowedRes : allowedRes?.isAllowed;
+          if (allowed) {
+            const addrRes = await getAddress();
+            const address = typeof addrRes === 'string' ? addrRes : addrRes?.address;
+            if (address && !addrRes?.error) {
+              setWalletAddress(address);
+              setBalance('10,000.00');
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Error restoring wallet state on mount:', err);
+      }
+    }
+    restoreWallet();
+  }, []);
+
+  // Sync bounties to localStorage on change
+  useEffect(() => {
+    localStorage.setItem('timecap_bounties', JSON.stringify(bounties));
+  }, [bounties]);
 
   const handleConnectWallet = async () => {
     try {
-      const connected = await isConnected();
+      const connectionRes = await isConnected();
+      const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
       if (!connected) {
         alert('Freighter wallet extension not found! Please install Freighter to connect.');
         return;
       }
       const accessObj = await requestAccess();
-      if (accessObj && accessObj.address) {
-        setWalletAddress(accessObj.address);
+      const address = typeof accessObj === 'string' ? accessObj : accessObj?.address;
+      if (address && !accessObj?.error) {
+        setWalletAddress(address);
         setBalance('10,000.00'); // Mocked balance for Testnet
       } else {
         const addrRes = await getAddress();
-        if (addrRes && addrRes.address) {
-          setWalletAddress(addrRes.address);
+        const fallbackAddr = typeof addrRes === 'string' ? addrRes : addrRes?.address;
+        if (fallbackAddr && !addrRes?.error) {
+          setWalletAddress(fallbackAddr);
           setBalance('10,000.00');
         }
       }
