@@ -3,7 +3,7 @@ import type { BountyBox } from './types';
 export const INITIAL_BOUNTIES: BountyBox[] = [
   {
     id: 'bounty-1',
-    contractId: 'CBA3X7K9P2M4N6Q8R1T3V5W7Y9Z2A4B6C8D0E2F4G6H8I',
+    contractId: 'CAG2TRR4Z6UKIPDI4TWHZVP2EJH5AULGVRD47HZDXI6KE6OH44B6RKWG',
     title: 'The Cypherpunk Riddle',
     hint: 'Famous Satoshi Nakamoto quote, uppercase words separated by hyphen (e.g. BTC-GENESIS-2009)',
     creator: 'GBX4...9KL2',
