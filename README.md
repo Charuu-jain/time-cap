@@ -38,10 +38,12 @@ npm run build
 
 ---
 
-## 📸 Screenshots & Proof of Operation
+## 📸 Level 1 Certification: Screenshots & Proof of Operation
 
-> [!NOTE]  
-> Below are labeled placeholder sections reserved for user interface screenshots during live Stellar Testnet testing and submission review.
+- **Deployed Testnet Contract ID**: `CAF2ZEJTU6W7CQ32B7QJAY4F74LDEMEQODJY5SY2FWVRKGD4ZOTPDVJT`
+- **Successful Transaction Hash**: `25329ecf92ed8026566c518e85cecd4fa8860169b74e0d8af6de80d61479f8b9`
+
+---
 
 ### 1. Wallet Connected
 ![Wallet Connected](./walletconnect.png)
