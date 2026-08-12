@@ -1,121 +1,102 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { StellarWalletsKit, Networks } from '@creit.tech/stellar-wallets-kit';
-import { FREIGHTER_ID, FreighterModule } from '@creit.tech/stellar-wallets-kit/modules/freighter';
-import { XBULL_ID, xBullModule } from '@creit.tech/stellar-wallets-kit/modules/xbull';
-import { ALBEDO_ID, AlbedoModule } from '@creit.tech/stellar-wallets-kit/modules/albedo';
+import { isConnected, isAllowed, requestAccess, getAddress, signTransaction } from '@stellar/freighter-api';
 
 interface WalletContextType {
   walletAddress: string | null;
-  selectedWalletId: string | null;
   balance: string | null;
   isConnected: boolean;
-  isModalOpen: boolean;
-  openWalletModal: () => void;
-  closeWalletModal: () => void;
-  connectWallet: (walletId: string) => Promise<void>;
-  disconnectWallet: () => Promise<void>;
+  connectWallet: () => Promise<void>;
+  disconnectWallet: () => void;
   signTx: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
 }
-
-// Initialize StellarWalletsKit static configuration
-StellarWalletsKit.init({
-  modules: [
-    new FreighterModule(),
-    new xBullModule(),
-    new AlbedoModule(),
-  ],
-  network: Networks.TESTNET,
-});
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openWalletModal = () => setIsModalOpen(true);
-  const closeWalletModal = () => setIsModalOpen(false);
-
+  // Restore Freighter wallet state on initial mount
   useEffect(() => {
     async function restoreConnection() {
       try {
-        const savedWalletId = localStorage.getItem('timecap_wallet_id');
-        const savedAddress = localStorage.getItem('timecap_wallet_address');
-        if (savedWalletId && savedAddress) {
-          try {
-            StellarWalletsKit.setWallet(savedWalletId);
-            setSelectedWalletId(savedWalletId);
-            setWalletAddress(savedAddress);
-            setBalance('10,000.00');
-          } catch (innerErr) {
-            console.warn('Silent wallet set failure:', innerErr);
+        const connectionRes = await isConnected();
+        const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
+        if (connected) {
+          const allowedRes = await isAllowed();
+          const allowed = typeof allowedRes === 'boolean' ? allowedRes : allowedRes?.isAllowed;
+          if (allowed) {
+            const addrRes = await getAddress();
+            const address = typeof addrRes === 'string' ? addrRes : addrRes?.address;
+            if (address && !addrRes?.error) {
+              setWalletAddress(address);
+              setBalance('10,000.00');
+            }
           }
         }
       } catch (err) {
-        console.warn('Silent wallet restore error:', err);
+        console.warn('Silent Freighter wallet restore check:', err);
       }
     }
     restoreConnection();
   }, []);
 
-  const connectWallet = async (walletId: string) => {
+  const connectWallet = async () => {
     try {
-      StellarWalletsKit.setWallet(walletId);
-      const res = await StellarWalletsKit.getAddress();
-      const address = typeof res === 'string' ? res : res?.address;
-      if (!address) {
-        throw new Error('Wallet extension not found or address request denied.');
+      const connectionRes = await isConnected();
+      const connected = typeof connectionRes === 'boolean' ? connectionRes : connectionRes?.isConnected;
+      if (!connected) {
+        throw new Error('Freighter wallet extension not found! Please install Freighter to connect.');
       }
-      setSelectedWalletId(walletId);
-      setWalletAddress(address);
-      setBalance('10,000.00');
-      localStorage.setItem('timecap_wallet_id', walletId);
-      localStorage.setItem('timecap_wallet_address', address);
-      setIsModalOpen(false);
+      const accessObj = await requestAccess();
+      const address = typeof accessObj === 'string' ? accessObj : accessObj?.address;
+      if (address && !accessObj?.error) {
+        setWalletAddress(address);
+        setBalance('10,000.00');
+      } else {
+        const addrRes = await getAddress();
+        const fallbackAddr = typeof addrRes === 'string' ? addrRes : addrRes?.address;
+        if (fallbackAddr && !addrRes?.error) {
+          setWalletAddress(fallbackAddr);
+          setBalance('10,000.00');
+        } else {
+          throw new Error('User denied wallet connection access.');
+        }
+      }
     } catch (err: any) {
-      const errorMsg = err?.message || (typeof err === 'string' ? err : 'Selected wallet module is not installed or available.');
-      console.warn('Wallet Kit Connection Error (handled):', errorMsg);
-      throw new Error(errorMsg);
+      console.warn('Freighter connection error:', err?.message || err);
+      throw err;
     }
   };
 
-  const disconnectWallet = async () => {
-    try {
-      await StellarWalletsKit.disconnect();
-    } catch (e) {
-      // ignore
-    }
+  const disconnectWallet = () => {
     setWalletAddress(null);
-    setSelectedWalletId(null);
     setBalance(null);
-    localStorage.removeItem('timecap_wallet_id');
-    localStorage.removeItem('timecap_wallet_address');
   };
 
   const signTx = async (xdr: string, opts?: any) => {
     if (!walletAddress) {
       throw new Error('No wallet connected.');
     }
-    const res = await StellarWalletsKit.signTransaction(xdr, {
-      networkPassphrase: Networks.TESTNET,
+    const signedResult: any = await signTransaction(xdr, {
+      networkPassphrase: 'Test SDF Network ; September 2015',
       address: walletAddress,
       ...opts,
     });
-    return res;
+
+    const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult?.signedTxXdr || signedResult?.signedAuthEntry);
+    if (!signedXdr || signedResult?.error) {
+      throw new Error(signedResult?.error || 'Transaction signing was rejected by user in Freighter.');
+    }
+    return { signedTxXdr: signedXdr };
   };
 
   return (
     <WalletContext.Provider
       value={{
         walletAddress,
-        selectedWalletId,
         balance,
         isConnected: !!walletAddress,
-        isModalOpen,
-        openWalletModal,
-        closeWalletModal,
         connectWallet,
         disconnectWallet,
         signTx,
@@ -133,5 +114,3 @@ export const useWallet = () => {
   }
   return context;
 };
-
-export { FREIGHTER_ID, XBULL_ID, ALBEDO_ID };
