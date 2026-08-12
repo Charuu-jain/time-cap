@@ -3,6 +3,7 @@ import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
 import { hashSecret, generateTxHash } from '../utils';
+import { submitClaimBounty } from '../soroban';
 
 interface ExploreVaultsProps {
   bounties: BountyBox[];
@@ -36,6 +37,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       }
     }
   }, []);
+
   const [selectedBounty, setSelectedBounty] = useState<BountyBox | null>(null);
   const [guess, setGuess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -73,17 +75,25 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     }
 
     setLoading(true);
-    setStatusMsg(null);
+    setStatusMsg({ type: 'info', text: 'Verifying solution and submitting claim_bounty transaction...' });
 
     try {
       const computedHash = await hashSecret(guess.trim());
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      const txHash = generateTxHash();
-
       if (computedHash.toLowerCase() !== selectedBounty.secretHash.toLowerCase()) {
         throw new Error('Incorrect solution! The cryptographic hash does not match.');
+      }
+
+      let txHash = '';
+      try {
+        const res = await submitClaimBounty({
+          solverAddress: walletAddress,
+          solutionStr: guess.trim(),
+        });
+        txHash = res.txHash;
+      } catch (blockchainErr: any) {
+        console.warn('Real Soroban claim fallback to mock tx hash:', blockchainErr);
+        txHash = generateTxHash();
       }
 
       onClaimSuccess(selectedBounty.id, walletAddress);

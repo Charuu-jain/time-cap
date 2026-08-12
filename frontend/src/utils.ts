@@ -1,9 +1,12 @@
 import type { BountyBox } from './types';
 
+export const CONTRACT_ID = 'CAF2ZEJTU6W7CQ32B7QJAY4F74LDEMEQODJY5SY2FWVRKGD4ZOTPDVJT';
+export const XLM_TOKEN_ID = 'CDLZFC3SYJYDZT7K67LZ754A5QJ6TWEA2V3OHE3F3Z6X43F5G2424NMB';
+
 export const INITIAL_BOUNTIES: BountyBox[] = [
   {
     id: 'bounty-1',
-    contractId: 'CAG2TRR4Z6UKIPDI4TWHZVP2EJH5AULGVRD47HZDXI6KE6OH44B6RKWG',
+    contractId: CONTRACT_ID,
     title: 'The Cypherpunk Riddle',
     hint: 'Famous Satoshi Nakamoto quote, uppercase words separated by hyphen (e.g. BTC-GENESIS-2009)',
     creator: 'GBX4...9KL2',

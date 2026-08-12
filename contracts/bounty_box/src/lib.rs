@@ -31,10 +31,10 @@ impl BountyBoxContract {
     /// Initialize contract with a secret hash, bounty amount, token address, and creator.
     pub fn create_bounty(
         env: Env,
+        token: Address,
         creator: Address,
         secret_hash: BytesN<32>,
         amount: i128,
-        token: Address,
     ) -> Result<(), Error> {
         creator.require_auth();
 

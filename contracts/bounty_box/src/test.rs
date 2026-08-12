@@ -31,7 +31,7 @@ fn test_bounty_box_flow() {
     let bounty_amount = 500_0000000i128;
 
     // Create bounty
-    client.create_bounty(&creator, &secret_hash, &bounty_amount, &token_contract.address());
+    client.create_bounty(&token_contract.address(), &creator, &secret_hash, &bounty_amount);
 
     assert_eq!(token_client.balance(&creator), 500_0000000);
     assert_eq!(token_client.balance(&contract_id), 500_0000000);
@@ -68,7 +68,7 @@ fn test_incorrect_solution_panics() {
     secret_solution.copy_into_slice(&mut slice_buf[..len]);
     let secret_hash: BytesN<32> = env.crypto().sha256(&soroban_sdk::Bytes::from_slice(&env, &slice_buf[..len]));
 
-    client.create_bounty(&creator, &secret_hash, &500_0000000i128, &token_contract.address());
+    client.create_bounty(&token_contract.address(), &creator, &secret_hash, &500_0000000i128);
 
     // Try wrong solution
     let wrong_solution = String::from_str(&env, "WrongPassword");
