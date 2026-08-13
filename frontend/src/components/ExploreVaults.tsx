@@ -15,7 +15,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
   bounties: initialBountiesFromProps,
   onClaimSuccess,
 }) => {
-  const { walletAddress, signTx } = useWallet();
+  const { walletAddress, signTx, refreshBalance } = useWallet();
   // State synced from parent props
   const bounties = initialBountiesFromProps;
 
@@ -87,6 +87,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       const txHash = res.txHash;
 
       onClaimSuccess(selectedBounty.id, walletAddress);
+      await refreshBalance();
       setUnlockedModal({
         bounty: selectedBounty,
         amount: selectedBounty.amount,

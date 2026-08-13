@@ -10,7 +10,7 @@ interface CreateBountyProps {
 }
 
 export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) => {
-  const { walletAddress, signTx } = useWallet();
+  const { walletAddress, signTx, refreshBalance } = useWallet();
   const [title, setTitle] = useState('');
   const [secret, setSecret] = useState('');
   const [hint, setHint] = useState('');
@@ -53,6 +53,7 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
       });
 
       const txHash = res.txHash;
+      await refreshBalance();
 
       const newBounty: BountyBox = {
         id: `bounty-${Date.now()}`,
