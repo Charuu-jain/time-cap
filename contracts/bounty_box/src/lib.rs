@@ -21,13 +21,18 @@ pub enum Error {
 
 #[contracttype]
 #[derive(Clone)]
+pub struct BountyDetails {
+    pub creator: Address,
+    pub amount: i128,
+    pub claimed: bool,
+    pub token: Address,
+    pub registry_id: Address,
+}
+
+#[contracttype]
+#[derive(Clone)]
 pub enum DataKey {
-    BountyHash,
-    BountyCreator,
-    BountyAmount,
-    Claimed,
-    TokenAddress,
-    RegistryAddress,
+    Bounty(BytesN<32>),
 }
 
 #[contract]
@@ -35,7 +40,7 @@ pub struct BountyBoxContract;
 
 #[contractimpl]
 impl BountyBoxContract {
-    /// Initialize contract with a secret hash, bounty amount, token address, creator, and registry_id for cross-contract logging.
+    /// Create a bounty vault with a secret hash, bounty amount, token address, creator, and registry_id for cross-contract logging.
     pub fn create_bounty(
         env: Env,
         token: Address,
@@ -46,7 +51,7 @@ impl BountyBoxContract {
     ) -> Result<(), Error> {
         creator.require_auth();
 
-        if env.storage().instance().has(&DataKey::BountyCreator) {
+        if env.storage().persistent().has(&DataKey::Bounty(secret_hash.clone())) {
             return Err(Error::AlreadyInitialized);
         }
 
@@ -61,15 +66,16 @@ impl BountyBoxContract {
         // Emit Created event
         env.events().publish((symbol_short!("Created"), creator.clone()), amount);
 
-        env.storage().instance().set(&DataKey::BountyHash, &secret_hash);
-        env.storage().instance().set(&DataKey::BountyCreator, &creator);
-        env.storage().instance().set(&DataKey::BountyAmount, &amount);
-        env.storage().instance().set(&DataKey::TokenAddress, &token);
-        env.storage().instance().set(&DataKey::RegistryAddress, &registry_id);
-        env.storage().instance().set(&DataKey::Claimed, &false);
+        let details = BountyDetails {
+            creator,
+            amount,
+            claimed: false,
+            token,
+            registry_id,
+        };
 
-        // Extend TTL
-        env.storage().instance().extend_ttl(100000, 100000);
+        env.storage().persistent().set(&DataKey::Bounty(secret_hash.clone()), &details);
+        env.storage().persistent().extend_ttl(&DataKey::Bounty(secret_hash), 100000, 100000);
 
         Ok(())
     }
@@ -77,26 +83,6 @@ impl BountyBoxContract {
     /// Claim bounty by submitting the plain string password
     pub fn claim_bounty(env: Env, solver: Address, solution_str: String) -> Result<bool, Error> {
         solver.require_auth();
-
-        if !env.storage().instance().has(&DataKey::BountyCreator) {
-            return Err(Error::NotInitialized);
-        }
-
-        let is_claimed: bool = env
-            .storage()
-            .instance()
-            .get(&DataKey::Claimed)
-            .unwrap_or(false);
-
-        if is_claimed {
-            return Err(Error::AlreadyClaimed);
-        }
-
-        let stored_hash: BytesN<32> = env
-            .storage()
-            .instance()
-            .get(&DataKey::BountyHash)
-            .unwrap();
 
         let len = solution_str.len() as usize;
         if len > 256 {
@@ -108,41 +94,38 @@ impl BountyBoxContract {
 
         let computed_hash: BytesN<32> = env.crypto().sha256(&soroban_sdk::Bytes::from_slice(&env, &slice_buf[..len])).into();
 
-        if computed_hash != stored_hash {
+        let bounty_key = DataKey::Bounty(computed_hash.clone());
+        if !env.storage().persistent().has(&bounty_key) {
             panic!("Incorrect solution");
         }
-
-        let amount: i128 = env
+        let mut details: BountyDetails = env
             .storage()
-            .instance()
-            .get(&DataKey::BountyAmount)
-            .unwrap();
-            
-        let token: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::TokenAddress)
+            .persistent()
+            .get(&bounty_key)
             .unwrap();
 
-        let token_client = token::Client::new(&env, &token);
-        token_client.transfer(&env.current_contract_address(), &solver, &amount);
+        if details.claimed {
+            return Err(Error::AlreadyClaimed);
+        }
+
+        let token_client = token::Client::new(&env, &details.token);
+        token_client.transfer(&env.current_contract_address(), &solver, &details.amount);
 
         // Emit Claimed event
-        env.events().publish((symbol_short!("Claimed"), solver.clone()), amount);
+        env.events().publish((symbol_short!("Claimed"), solver.clone()), details.amount);
 
-        env.storage().instance().set(&DataKey::Claimed, &true);
+        details.claimed = true;
+        env.storage().persistent().set(&bounty_key, &details);
+        env.storage().persistent().extend_ttl(&bounty_key, 100000, 100000);
 
         Ok(true)
     }
 
-    /// Get contract bounty status details
-    pub fn get_bounty_info(env: Env) -> (Address, i128, bool, BytesN<32>) {
-        let creator: Address = env.storage().instance().get(&DataKey::BountyCreator).unwrap();
-        let amount: i128 = env.storage().instance().get(&DataKey::BountyAmount).unwrap();
-        let claimed: bool = env.storage().instance().get(&DataKey::Claimed).unwrap_or(false);
-        let hash: BytesN<32> = env.storage().instance().get(&DataKey::BountyHash).unwrap();
-
-        (creator, amount, claimed, hash)
+    /// Get contract bounty status details by secret hash
+    pub fn get_bounty_info(env: Env, secret_hash: BytesN<32>) -> (Address, i128, bool, BytesN<32>) {
+        let bounty_key = DataKey::Bounty(secret_hash.clone());
+        let details: BountyDetails = env.storage().persistent().get(&bounty_key).unwrap();
+        (details.creator, details.amount, details.claimed, secret_hash)
     }
 }
 
