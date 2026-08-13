@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, Zap } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { useWallet } from '../WalletContext';
 
 export const Navbar: React.FC = () => {
@@ -20,44 +20,38 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50 px-6 py-3.5 transition-all">
+    <nav className="border-b border-stone-200/80 bg-[#F9F6F0]/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4 transition-all">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Logo */}
-        <div className="flex items-center space-x-3.5">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 border border-indigo-400/20">
-            <Zap className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2.5">
-              <h1 className="text-xl font-bold tracking-tight text-slate-100">Time-Capsule</h1>
-              <span className="bg-indigo-500/10 text-indigo-400 text-xs px-2.5 py-0.5 rounded-full border border-indigo-500/20 font-mono font-medium">
-                Bounty Box
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 tracking-wide">Stellar Soroban Vault Rewards</p>
-          </div>
+        {/* Typography-Based Serif Logo */}
+        <div className="flex items-center space-x-3">
+          <span className="font-serif text-2xl font-normal text-rose-900 tracking-widest">
+            Vault.
+          </span>
+          <span className="bg-rose-900/10 text-rose-900 text-xs px-2.5 py-0.5 rounded-full border border-rose-900/20 font-mono font-medium">
+            Time-Capsule
+          </span>
         </div>
 
         {/* Status / Connect Button */}
         <div className="flex items-center space-x-4">
-          <div className="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span>
+          <div className="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-stone-200/60 border border-stone-300 text-stone-700 text-xs font-mono font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 mr-2"></span>
             Stellar Testnet
           </div>
 
           {isConnected && walletAddress ? (
-            <div className="flex items-center space-x-3 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5 pl-4 shadow-sm">
+            <div className="flex items-center space-x-3 bg-white border border-stone-200 rounded-xl p-1.5 pl-4 shadow-sm">
               <div className="flex flex-col text-right">
-                <span className="text-xs font-mono font-medium text-slate-200">
+                <span className="text-xs font-mono font-medium text-stone-800">
                   {walletAddress.slice(0, 5)}...{walletAddress.slice(-5)}
                 </span>
-                <span className="text-xs font-mono text-indigo-400 font-semibold">
+                <span className="text-xs font-mono text-rose-900 font-semibold">
                   {balance ? `${balance} XLM` : 'Loading...'}
                 </span>
               </div>
               <button
                 onClick={disconnectWallet}
-                className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-medium rounded-lg transition-all duration-200 cursor-pointer active:scale-95"
+                className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-900 text-xs font-medium rounded-lg transition-opacity duration-300 cursor-pointer"
               >
                 Disconnect
               </button>
@@ -65,9 +59,9 @@ export const Navbar: React.FC = () => {
           ) : (
             <button
               onClick={handleConnect}
-              className="flex items-center space-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-medium text-sm rounded-xl shadow-lg shadow-indigo-600/25 border border-indigo-400/20 transition-all duration-200 cursor-pointer"
+              className="flex items-center space-x-2 px-5 py-2.5 bg-rose-900 hover:bg-rose-800 text-stone-50 font-medium text-sm rounded-xl border border-rose-900/20 transition-opacity duration-300 cursor-pointer shadow-sm"
             >
-              <Wallet className="w-4 h-4" />
+              <Wallet className="w-4 h-4 text-stone-100" />
               <span>Connect Freighter</span>
             </button>
           )}

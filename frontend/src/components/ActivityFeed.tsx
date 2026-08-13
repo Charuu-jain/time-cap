@@ -97,33 +97,33 @@ export const ActivityFeed: React.FC = () => {
   }, []);
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-slate-800/80 shadow-xl mb-8">
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/60">
+    <div className="glass-card rounded-2xl p-6 border border-stone-200 shadow-sm mb-8 bg-white">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-stone-100">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-            <Activity className="w-4 h-4 animate-pulse" />
+          <div className="w-8 h-8 rounded-lg bg-rose-900/10 border border-rose-900/20 flex items-center justify-center text-rose-900">
+            <Activity className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              Real-Time Contract Events <Sparkles className="w-4 h-4 text-amber-400" />
+            <h3 className="text-base font-serif font-normal text-rose-950 flex items-center gap-2">
+              Real-Time Contract Events <Sparkles className="w-4 h-4 text-amber-700" />
             </h3>
-            <p className="text-xs text-slate-400">Live Soroban event stream polling every 8s</p>
+            <p className="text-xs text-stone-500 font-light">Live Soroban event stream polling every 8s</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
-          <Clock className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="flex items-center space-x-2 text-xs font-mono text-stone-600 bg-stone-100/70 px-3 py-1.5 rounded-full border border-stone-200">
+          <Clock className="w-3.5 h-3.5 text-rose-900" />
           <span>Last sync: {lastPolled}</span>
         </div>
       </div>
 
       {loading ? (
-        <div className="py-6 text-center text-xs font-mono text-slate-400 flex items-center justify-center space-x-2">
-          <span className="w-4 h-4 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></span>
+        <div className="py-6 text-center text-xs font-mono text-stone-500 flex items-center justify-center space-x-2">
+          <span className="w-4 h-4 border-2 border-rose-900/20 border-t-rose-900 rounded-full animate-spin"></span>
           <span>Polling Soroban Contract Event Logs...</span>
         </div>
       ) : events.length === 0 ? (
-        <div className="py-6 text-center text-xs text-slate-400 font-mono bg-slate-900/40 rounded-xl border border-slate-800/60">
+        <div className="py-6 text-center text-xs text-stone-500 font-mono bg-stone-50 rounded-xl border border-stone-200/60">
           No contract events published yet on Testnet. Create or claim a vault to trigger events!
         </div>
       ) : (
@@ -131,31 +131,31 @@ export const ActivityFeed: React.FC = () => {
           {events.map((evt) => (
             <div
               key={evt.id}
-              className={`p-3 rounded-xl border flex items-center justify-between text-xs font-mono transition-all duration-200 ${
+              className={`p-3 rounded-xl border flex items-center justify-between text-xs font-mono transition-opacity duration-300 ${
                 evt.type === 'Created'
-                  ? 'bg-indigo-950/20 border-indigo-500/30 text-indigo-300'
-                  : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
+                  ? 'bg-rose-50/60 border-rose-200 text-rose-900'
+                  : 'bg-emerald-50/60 border-emerald-200 text-emerald-900'
               }`}
             >
               <div className="flex items-center space-x-2.5">
                 {evt.type === 'Created' ? (
-                  <Lock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+                  <Lock className="w-4 h-4 text-rose-900 flex-shrink-0" />
                 ) : (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
                 )}
                 <div>
                   <span className="font-bold uppercase tracking-wider mr-2">
                     [{evt.type}]
                   </span>
-                  <span className="text-slate-300">
+                  <span className="text-stone-700">
                     {evt.type === 'Created' ? 'Bounty Vault Lock' : 'Vault Reward Claim'}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3 text-right">
-                <span className="text-slate-400">Account: {evt.account}</span>
-                <span className="font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                <span className="text-stone-500">Account: {evt.account}</span>
+                <span className="font-bold text-amber-800 bg-amber-100/60 px-2 py-0.5 rounded border border-amber-300">
                   Ledger #{evt.ledger}
                 </span>
               </div>

@@ -26,7 +26,7 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletAddress) {
-      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet via the Multi-Wallet modal first!' });
+      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet first!' });
       return;
     }
     if (!title.trim() || !secret.trim() || !amount || Number(amount) <= 0) {
@@ -92,42 +92,40 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      <div className="glass-panel rounded-2xl p-6 sm:p-8 border border-slate-800/80 shadow-2xl relative overflow-hidden">
-        <div className="absolute -right-20 -top-20 w-60 h-60 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-stone-200 shadow-sm relative overflow-hidden">
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-            <Lock className="w-6 h-6 text-indigo-400" />
+          <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center">
+            <Lock className="w-6 h-6 text-rose-900" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Create a Bounty Box</h2>
-            <p className="text-sm text-slate-400">Lock XLM rewards inside a cryptographic Soroban smart vault</p>
+            <h2 className="text-2xl font-serif font-normal text-rose-950">Create a Bounty Box</h2>
+            <p className="text-sm text-stone-600 font-light">Lock XLM rewards inside a cryptographic Soroban smart vault</p>
           </div>
         </div>
 
         {statusMsg && (
           <div
-            className={`mb-6 p-4 rounded-xl text-sm border flex flex-col space-y-2 transition-all duration-200 ${
+            className={`mb-6 p-4 rounded-xl text-sm border flex flex-col space-y-2 transition-opacity duration-300 ${
               statusMsg.type === 'success'
-                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : statusMsg.type === 'error'
-                ? 'bg-red-500/10 border-red-500/20 text-red-400'
-                : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300 animate-pulse'
+                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                : 'bg-stone-50 border-stone-200 text-stone-800'
             }`}
           >
             <div className="flex items-start space-x-3">
-              <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <ShieldAlert className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-900" />
               <span className="break-all font-medium">{statusMsg.text}</span>
             </div>
 
             {statusMsg.txHash && (
               <div className="mt-2 pt-2 border-t border-current/20 font-mono text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="text-slate-300">Transaction Hash:</span>
+                <span className="text-stone-600">Transaction Hash:</span>
                 <a
                   href={`https://stellar.expert/explorer/testnet/tx/${statusMsg.txHash}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-bold underline flex items-center gap-1 hover:text-white break-all transition-colors"
+                  className="font-bold underline flex items-center gap-1 hover:text-rose-900 break-all transition-colors"
                 >
                   <span>{statusMsg.txHash.slice(0, 16)}...{statusMsg.txHash.slice(-16)}</span>
                   <ExternalLink className="w-3 h-3" />
@@ -139,7 +137,7 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
               Bounty Title *
             </label>
             <input
@@ -147,13 +145,13 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
               placeholder="e.g., Quantum Cipher Riddle #1"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium transition-all duration-200"
+              className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 font-medium transition-colors"
               required
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
               Secret Password / Answer *
             </label>
             <div className="relative">
@@ -162,19 +160,19 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
                 placeholder="Plaintext solution (Hashed locally before on-chain commit)"
                 value={secret}
                 onChange={(e) => setSecret(e.target.value)}
-                className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono text-sm transition-all duration-200"
+                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 pl-11 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 font-mono text-sm transition-colors"
                 required
               />
-              <KeyRound className="w-5 h-5 text-slate-500 absolute left-3.5 top-3.5" />
+              <KeyRound className="w-5 h-5 text-stone-400 absolute left-3.5 top-3.5" />
             </div>
-            <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <p className="text-xs text-stone-500 mt-1.5 flex items-center gap-1 font-light">
+              <Sparkles className="w-3.5 h-3.5 text-rose-900" />
               Secured with SHA-256 hashing. The plain password is never sent or stored on-chain!
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
               Public Hint (Optional)
             </label>
             <div className="relative">
@@ -183,14 +181,14 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
                 placeholder="e.g. Satoshi's birth year + Genesis Block code"
                 value={hint}
                 onChange={(e) => setHint(e.target.value)}
-                className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm transition-all duration-200"
+                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 pl-11 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 text-sm transition-colors"
               />
-              <HelpCircle className="w-5 h-5 text-slate-500 absolute left-3.5 top-3.5" />
+              <HelpCircle className="w-5 h-5 text-stone-400 absolute left-3.5 top-3.5" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
               XLM Reward Amount *
             </label>
             <div className="relative">
@@ -201,11 +199,11 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
                 placeholder="100"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-3 pl-11 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono text-base font-semibold transition-all duration-200"
+                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 pl-11 text-stone-900 placeholder-stone-400 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900 font-mono text-base font-semibold transition-colors"
                 required
               />
-              <Coins className="w-5 h-5 text-amber-400 absolute left-3.5 top-3.5" />
-              <span className="absolute right-4 top-3 text-xs font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-1 rounded border border-amber-400/20">
+              <Coins className="w-5 h-5 text-amber-700 absolute left-3.5 top-3.5" />
+              <span className="absolute right-4 top-3 text-xs font-mono font-bold text-amber-900 bg-amber-50 px-2 py-1 rounded border border-amber-200">
                 XLM
               </span>
             </div>
@@ -214,11 +212,11 @@ export const CreateBounty: React.FC<CreateBountyProps> = ({ onBountyCreated }) =
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-4 py-3.5 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 active:scale-95 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/25 border border-indigo-400/20 transition-all duration-200 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+            className="w-full mt-4 py-3.5 px-6 bg-rose-900 hover:opacity-90 text-stone-50 font-medium rounded-xl border border-rose-900/20 transition-opacity duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 shadow-sm"
           >
             {loading ? (
               <span className="flex items-center space-x-2 text-sm font-mono">
-                <RefreshCw className="w-4 h-4 text-indigo-300 animate-spin" />
+                <RefreshCw className="w-4 h-4 text-stone-100 animate-spin" />
                 <span>{pendingStep || 'Processing Soroban Transaction...'}</span>
               </span>
             ) : (

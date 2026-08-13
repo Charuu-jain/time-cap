@@ -48,7 +48,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       particleCount: 120,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#6366f1', '#f59e0b', '#10b981', '#ec4899'],
+      colors: ['#9f1239', '#d97706', '#059669', '#be123c'],
     });
   };
 
@@ -56,7 +56,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     e.preventDefault();
     if (!selectedBounty) return;
     if (!walletAddress) {
-      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet via the Multi-Wallet modal to claim bounties!' });
+      setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet to claim bounties!' });
       return;
     }
     if (!guess.trim()) {
@@ -117,10 +117,10 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            Explore & Crack Vaults <Sparkles className="w-5 h-5 text-amber-400" />
+          <h2 className="text-2xl font-serif font-normal text-rose-950 flex items-center gap-2">
+            Explore & Crack Vaults <Sparkles className="w-5 h-5 text-amber-700" />
           </h2>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-stone-600 font-light">
             Enter plaintext solutions to verify on-chain and instantly claim locked XLM bounties
           </p>
         </div>
@@ -131,20 +131,20 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
             placeholder="Search active puzzles..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-stellar-dark border border-stellar-border rounded-xl px-4 py-2.5 pl-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+            className="w-full bg-white border border-stone-200 rounded-xl px-4 py-2.5 pl-10 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900"
           />
-          <Search className="w-4 h-4 text-gray-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
         </div>
       </div>
 
       {/* Grid of Vaults */}
       {filteredBounties.length === 0 ? (
-        <div className="glass-card rounded-2xl p-12 text-center border border-stellar-border flex flex-col items-center justify-center my-8">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+        <div className="glass-card rounded-2xl p-12 text-center border border-stone-200 flex flex-col items-center justify-center my-8 bg-white">
+          <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center mb-4 text-rose-900">
             <Inbox className="w-8 h-8" />
           </div>
-          <h3 className="text-xl font-bold text-white mb-2">No Active Bounty Vaults Found</h3>
-          <p className="text-sm text-gray-400 max-w-md mb-6">
+          <h3 className="text-xl font-serif font-normal text-rose-950 mb-2">No Active Bounty Vaults Found</h3>
+          <p className="text-sm text-stone-600 max-w-md mb-6 font-light">
             There are currently no active time-capsule bounty boxes available. Create a new vault to lock XLM bounties!
           </p>
         </div>
@@ -153,8 +153,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
           {filteredBounties.map((bounty) => (
             <div
               key={bounty.id}
-              className={`glass-card rounded-2xl p-6 border relative flex flex-col justify-between overflow-hidden ${
-                bounty.claimed ? 'border-gray-800 opacity-75' : 'border-stellar-border'
+              className={`glass-card rounded-2xl p-6 border relative flex flex-col justify-between overflow-hidden bg-white ${
+                bounty.claimed ? 'border-stone-200 opacity-80' : 'border-stone-200'
               }`}
             >
             {/* Header Badge */}
@@ -162,8 +162,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
               <span
                 className={`text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 ${
                   bounty.claimed
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
+                    ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-900 border border-rose-200'
                 }`}
               >
                 {bounty.claimed ? (
@@ -177,18 +177,18 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                 )}
               </span>
 
-              <div className="flex items-center space-x-1.5 text-amber-400 font-mono font-bold text-lg">
-                <Coins className="w-5 h-5 text-amber-400" />
+              <div className="flex items-center space-x-1.5 text-amber-800 font-mono font-bold text-lg">
+                <Coins className="w-5 h-5 text-amber-700" />
                 <span>{bounty.amount} XLM</span>
               </div>
             </div>
 
             {/* Title & Info */}
             <div className="mb-6">
-              <h3 className="text-xl font-bold text-white mb-2">{bounty.title}</h3>
+              <h3 className="text-xl font-serif font-normal text-rose-950 mb-2">{bounty.title}</h3>
               {bounty.hint && (
-                <div className="bg-stellar-dark/60 border border-stellar-border/60 rounded-xl p-3 text-xs text-gray-300 mb-3">
-                  <span className="text-indigo-400 font-semibold uppercase tracking-wider block mb-1">
+                <div className="bg-stone-50 border border-stone-200/80 rounded-xl p-3 text-xs text-stone-700 mb-3">
+                  <span className="text-rose-900 font-semibold uppercase tracking-wider block mb-1">
                     Hint:
                   </span>
                   {bounty.hint}
@@ -196,33 +196,33 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
               )}
 
               {bounty.solution && (
-                <div className="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 text-xs font-mono text-indigo-300 mb-3 flex items-center justify-between shadow-inner">
+                <div className="bg-rose-50/50 border border-rose-200 rounded-xl p-3 text-xs font-mono text-rose-900 mb-3 flex items-center justify-between shadow-inner">
                   <div className="flex items-center space-x-1.5">
-                    <Key className="w-3.5 h-3.5 text-indigo-400" />
-                    <span className="text-gray-300 font-medium">Solution Key:</span>
+                    <Key className="w-3.5 h-3.5 text-rose-900" />
+                    <span className="text-stone-700 font-medium">Solution Key:</span>
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <span className="bg-indigo-500/20 px-2.5 py-1 rounded-lg text-indigo-200 font-bold tracking-wide border border-indigo-500/30">
+                    <span className="bg-white px-2.5 py-1 rounded-lg text-rose-900 font-bold tracking-wide border border-rose-200">
                       {visiblePasswords[bounty.id] ? bounty.solution : '••••••••'}
                     </span>
                     <button
                       type="button"
                       onClick={() => togglePasswordVisibility(bounty.id)}
-                      className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-indigo-500/20 transition-colors cursor-pointer"
+                      className="p-1 rounded-md text-stone-500 hover:text-rose-900 hover:bg-rose-100/50 transition-opacity duration-300 cursor-pointer"
                       title={visiblePasswords[bounty.id] ? 'Hide Password' : 'Show Password'}
                     >
                       {visiblePasswords[bounty.id] ? (
-                        <EyeOff className="w-4 h-4 text-indigo-300" />
+                        <EyeOff className="w-4 h-4 text-rose-900" />
                       ) : (
-                        <Eye className="w-4 h-4 text-gray-400" />
+                        <Eye className="w-4 h-4 text-stone-500" />
                       )}
                     </button>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-1 text-xs font-mono text-gray-500">
+              <div className="space-y-1 text-xs font-mono text-stone-500">
                 <p>Creator: {bounty.creator}</p>
                 <p className="truncate">Hash: {bounty.secretHash.slice(0, 16)}...</p>
               </div>
@@ -230,8 +230,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
 
             {/* Button */}
             {bounty.claimed ? (
-              <div className="w-full py-2.5 px-4 bg-gray-800/50 border border-gray-700/50 rounded-xl text-xs font-mono text-gray-400 text-center flex items-center justify-center space-x-2">
-                <Unlock className="w-4 h-4 text-emerald-400" />
+              <div className="w-full py-2.5 px-4 bg-stone-100 border border-stone-200 rounded-xl text-xs font-mono text-stone-600 text-center flex items-center justify-center space-x-2">
+                <Unlock className="w-4 h-4 text-emerald-700" />
                 <span>Solved by {bounty.claimedBy || 'Bounty Hunter'}</span>
               </div>
             ) : (
@@ -241,7 +241,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                   setStatusMsg(null);
                   setGuess(bounty.solution || '');
                 }}
-                className="w-full py-2.5 px-4 bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer"
+                className="w-full py-2.5 px-4 bg-rose-900 hover:opacity-90 text-stone-50 font-medium rounded-xl border border-rose-900/20 transition-opacity duration-300 flex items-center justify-center space-x-2 cursor-pointer shadow-sm"
               >
                 <Key className="w-4 h-4" />
                 <span>Attempt Solution</span>
@@ -254,26 +254,26 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
 
       {/* Claim Modal */}
       {selectedBounty && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="glass-panel w-full max-w-lg rounded-2xl p-6 border border-stellar-border shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl p-6 border border-stone-200 shadow-xl relative">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Key className="w-5 h-5 text-indigo-400" /> Crack Vault Solution
+              <h3 className="text-xl font-serif font-normal text-rose-950 flex items-center gap-2">
+                <Key className="w-5 h-5 text-rose-900" /> Crack Vault Solution
               </h3>
               <button
                 onClick={() => setSelectedBounty(null)}
-                className="text-gray-400 hover:text-white text-lg font-bold px-2 cursor-pointer"
+                className="text-stone-400 hover:text-stone-800 text-lg font-bold px-2 cursor-pointer transition-colors"
               >
                 ✕
               </button>
             </div>
 
-            <div className="mb-4 bg-indigo-950/30 border border-indigo-800/40 rounded-xl p-4">
-              <p className="text-sm font-semibold text-indigo-200 mb-1">{selectedBounty.title}</p>
-              <p className="text-xs text-amber-400 font-mono font-bold">Reward: {selectedBounty.amount} XLM</p>
+            <div className="mb-4 bg-stone-50 border border-stone-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-rose-950 mb-1">{selectedBounty.title}</p>
+              <p className="text-xs text-amber-800 font-mono font-bold">Reward: {selectedBounty.amount} XLM</p>
               {selectedBounty.hint && (
-                <p className="text-xs text-gray-400 mt-2">
-                  <span className="text-gray-300 font-semibold">Hint:</span> {selectedBounty.hint}
+                <p className="text-xs text-stone-600 mt-2">
+                  <span className="text-stone-800 font-semibold">Hint:</span> {selectedBounty.hint}
                 </p>
               )}
             </div>
@@ -282,23 +282,23 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
               <div
                 className={`mb-4 p-3 rounded-xl text-xs flex flex-col space-y-2 border ${
                   statusMsg.type === 'error'
-                    ? 'bg-red-500/10 border-red-500/30 text-red-400'
-                    : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
+                    ? 'bg-rose-50 border-rose-200 text-rose-900'
+                    : 'bg-stone-50 border-stone-200 text-stone-800'
                 }`}
               >
                 <div className="flex items-center space-x-2">
-                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-900" />
                   <span>{statusMsg.text}</span>
                 </div>
 
                 {statusMsg.txHash && (
                   <div className="pt-2 border-t border-current/20 font-mono flex items-center justify-between">
-                    <span className="text-gray-400">Tx Hash:</span>
+                    <span className="text-stone-600">Tx Hash:</span>
                     <a
                       href={`https://stellar.expert/explorer/testnet/tx/${statusMsg.txHash}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-bold underline flex items-center gap-1 hover:text-white break-all"
+                      className="font-bold underline flex items-center gap-1 hover:text-rose-900 break-all"
                     >
                       <span>{statusMsg.txHash.slice(0, 12)}...{statusMsg.txHash.slice(-12)}</span>
                       <ExternalLink className="w-3 h-3" />
@@ -310,7 +310,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
 
             <form onSubmit={handleClaim} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-300 uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-2">
                   Enter Plaintext Guess *
                 </label>
                 <input
@@ -318,7 +318,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                   placeholder="Case-sensitive answer string"
                   value={guess}
                   onChange={(e) => setGuess(e.target.value)}
-                  className="w-full bg-stellar-dark border border-stellar-border rounded-xl px-4 py-3 text-white placeholder-gray-500 font-mono text-sm focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-stone-900 placeholder-stone-400 font-mono text-sm focus:outline-none focus:border-rose-900 focus:ring-1 focus:ring-rose-900"
                   required
                 />
               </div>
@@ -326,11 +326,11 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3 bg-rose-900 hover:opacity-90 text-stone-50 font-medium rounded-xl shadow-sm transition-opacity duration-300 flex items-center justify-center space-x-2 cursor-pointer disabled:opacity-50 border border-rose-900/20"
               >
                 {loading ? (
                   <span className="flex items-center space-x-2 text-xs font-mono">
-                    <RefreshCw className="w-4 h-4 text-indigo-300 animate-spin" />
+                    <RefreshCw className="w-4 h-4 text-stone-100 animate-spin" />
                     <span>{pendingStep || 'Invoking Soroban claim_bounty...'}</span>
                   </span>
                 ) : (
@@ -347,35 +347,33 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
 
       {/* Congratulatory Unlocked Modal */}
       {unlockedModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
-          <div className="glass-panel max-w-md w-full rounded-2xl p-8 border border-emerald-500/40 shadow-2xl text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-amber-400 to-indigo-500"></div>
-
-            <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <Sparkles className="w-8 h-8 text-emerald-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/50 backdrop-blur-md p-4">
+          <div className="bg-white max-w-md w-full rounded-2xl p-8 border border-stone-200 shadow-2xl text-center relative overflow-hidden">
+            <div className="w-16 h-16 bg-rose-50 border border-rose-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-rose-900" />
             </div>
 
-            <h2 className="text-2xl font-extrabold text-white mb-2">Vault Unlocked! 🎉</h2>
-            <p className="text-sm text-gray-300 mb-4">
+            <h2 className="text-2xl font-serif font-normal text-rose-950 mb-2">Vault Unlocked! 🎉</h2>
+            <p className="text-sm text-stone-600 mb-4 font-light">
               Congratulations! Your solution matched the Soroban SHA-256 state hash.
             </p>
 
-            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 mb-4">
-              <span className="text-xs text-emerald-400 uppercase font-semibold tracking-wider block mb-1">
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+              <span className="text-xs text-amber-900 uppercase font-semibold tracking-wider block mb-1">
                 Transferred to your wallet
               </span>
-              <span className="text-3xl font-extrabold text-amber-400 font-mono">
+              <span className="text-3xl font-extrabold text-amber-800 font-mono">
                 +{unlockedModal.amount} XLM
               </span>
             </div>
 
-            <div className="mb-6 p-3 rounded-xl bg-stellar-dark/80 border border-stellar-border font-mono text-xs flex flex-col text-left space-y-1">
-              <span className="text-gray-400 font-sans text-xs">On-Chain Transaction Hash:</span>
+            <div className="mb-6 p-3 rounded-xl bg-stone-50 border border-stone-200 font-mono text-xs flex flex-col text-left space-y-1">
+              <span className="text-stone-500 font-sans text-xs">On-Chain Transaction Hash:</span>
               <a
                 href={`https://stellar.expert/explorer/testnet/tx/${unlockedModal.txHash}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-indigo-400 font-bold underline flex items-center gap-1 hover:text-indigo-300 break-all"
+                className="text-rose-900 font-bold underline flex items-center gap-1 hover:text-rose-800 break-all"
               >
                 <span>{unlockedModal.txHash}</span>
                 <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
@@ -384,7 +382,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
 
             <button
               onClick={() => setUnlockedModal(null)}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg transition-all cursor-pointer"
+              className="w-full py-3 bg-rose-900 hover:opacity-90 text-stone-50 font-medium rounded-xl transition-opacity duration-300 cursor-pointer shadow-sm border border-rose-900/20"
             >
               Awesome!
             </button>
