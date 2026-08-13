@@ -206,6 +206,17 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                 </div>
               )}
 
+              {bounty.solution && (
+                <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-3 text-xs font-mono text-emerald-300 mb-3 flex items-center justify-between">
+                  <span className="text-emerald-400 font-semibold uppercase tracking-wider">
+                    🔑 Password:
+                  </span>
+                  <span className="bg-emerald-500/20 px-2 py-0.5 rounded text-white font-bold">
+                    {bounty.solution}
+                  </span>
+                </div>
+              )}
+
               <div className="space-y-1 text-xs font-mono text-gray-500">
                 <p>Creator: {bounty.creator}</p>
                 <p className="truncate">Hash: {bounty.secretHash.slice(0, 16)}...</p>
@@ -223,7 +234,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
                 onClick={() => {
                   setSelectedBounty(bounty);
                   setStatusMsg(null);
-                  setGuess('');
+                  setGuess(bounty.solution || '');
                 }}
                 className="w-full py-2.5 px-4 bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/40 text-indigo-300 hover:text-white font-medium rounded-xl transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >

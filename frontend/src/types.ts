@@ -3,6 +3,7 @@ export interface BountyBox {
   contractId: string;
   title: string;
   hint?: string;
+  solution?: string; // Plaintext solution displayed on page
   creator: string;
   amount: string; // in XLM
   claimed: boolean;
