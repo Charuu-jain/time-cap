@@ -18,40 +18,35 @@ function hexToBytesN32ScVal(hexStr: string): xdr.ScVal {
 }
 
 /**
- * Categorizes and formats errors for user-friendly UI display:
+ * Categorizes and unmasks errors for user-friendly UI display:
  * 1. Wallet Not Found / Not Installed
  * 2. Transaction Rejected by User
- * 3. Insufficient XLM Balance
+ * 3. Raw RPC simulation error messages directly from Soroban RPC
  */
 export function categorizeError(err: any): string {
-  const msg = err?.message || String(err);
+  if (!err) return 'Unknown error occurred.';
+
+  const rawMsg = typeof err === 'string' ? err : err?.message || err?.error || JSON.stringify(err);
+
   if (
-    msg.includes('Wallet Not Found') ||
-    msg.includes('not installed') ||
-    msg.includes('No wallet') ||
-    msg.includes('Extension not found')
+    rawMsg.includes('Wallet Not Found') ||
+    rawMsg.includes('not installed') ||
+    rawMsg.includes('No wallet') ||
+    rawMsg.includes('Extension not found')
   ) {
     return 'Wallet Error: Selected wallet extension is not installed or available.';
   }
   if (
-    msg.includes('User rejected') ||
-    msg.includes('declined') ||
-    msg.includes('user canceled') ||
-    msg.includes('User denied')
+    rawMsg.includes('User rejected') ||
+    rawMsg.includes('declined') ||
+    rawMsg.includes('user canceled') ||
+    rawMsg.includes('User denied')
   ) {
     return 'Transaction Error: Transaction request was rejected by the user.';
   }
-  if (
-    msg.includes('Error(Storage, MissingValue)') ||
-    msg.includes('insufficient balance') ||
-    msg.includes('underfunded') ||
-    msg.includes('tx_insufficient_balance') ||
-    msg.includes('HostError') ||
-    msg.includes('BalanceExceeded')
-  ) {
-    return 'Balance Error: Insufficient XLM balance or missing funded account on Testnet.';
-  }
-  return msg;
+
+  // Unmask simulation & raw error response details directly
+  return rawMsg;
 }
 
 /**
@@ -106,6 +101,7 @@ export async function submitCreateBounty({
 
     const amountStroops = BigInt(Math.round(parseFloat(amountXlm) * 10000000));
 
+    // Ensure parameters strictly match Soroban contract types (Address, Address, BytesN<32>, i128, Address)
     const tokenScVal = Address.fromString(XLM_TOKEN_ID).toScVal();
     const creatorScVal = Address.fromString(creatorAddress).toScVal();
     const secretHashScVal = hexToBytesN32ScVal(secretHash);
@@ -125,6 +121,10 @@ export async function submitCreateBounty({
     let preparedTx;
     try {
       preparedTx = await server.prepareTransaction(tx);
+      const simResponse = preparedTx as any;
+      if (simResponse?.error) {
+        throw new Error(simResponse.error);
+      }
     } catch (simErr: any) {
       throw new Error(`Simulation Failed: ${categorizeError(simErr)}`);
     }
