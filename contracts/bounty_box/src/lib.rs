@@ -1,7 +1,13 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, BytesN, Env, String,
+    contract, contractclient, contracterror, contractimpl, contracttype, symbol_short, token, Address, BytesN, Env, String,
 };
+
+// Define registry client for cross-contract calls
+#[contractclient(name = "RegistryClient")]
+pub trait RegistryInterface {
+    fn log_bounty(env: Env, bounty_id: BytesN<32>, creator: Address);
+}
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -21,6 +27,7 @@ pub enum DataKey {
     BountyAmount,
     Claimed,
     TokenAddress,
+    RegistryAddress,
 }
 
 #[contract]
@@ -28,13 +35,14 @@ pub struct BountyBoxContract;
 
 #[contractimpl]
 impl BountyBoxContract {
-    /// Initialize contract with a secret hash, bounty amount, token address, and creator.
+    /// Initialize contract with a secret hash, bounty amount, token address, creator, and registry_id for cross-contract logging.
     pub fn create_bounty(
         env: Env,
         token: Address,
         creator: Address,
         secret_hash: BytesN<32>,
         amount: i128,
+        registry_id: Address,
     ) -> Result<(), Error> {
         creator.require_auth();
 
@@ -46,6 +54,10 @@ impl BountyBoxContract {
         let token_client = token::Client::new(&env, &token);
         token_client.transfer(&creator, &env.current_contract_address(), &amount);
 
+        // Perform Cross-Contract Call to Registry Contract
+        let registry_client = RegistryClient::new(&env, &registry_id);
+        registry_client.log_bounty(&secret_hash, &creator);
+
         // Emit Created event
         env.events().publish((symbol_short!("Created"), creator.clone()), amount);
 
@@ -53,6 +65,7 @@ impl BountyBoxContract {
         env.storage().instance().set(&DataKey::BountyCreator, &creator);
         env.storage().instance().set(&DataKey::BountyAmount, &amount);
         env.storage().instance().set(&DataKey::TokenAddress, &token);
+        env.storage().instance().set(&DataKey::RegistryAddress, &registry_id);
         env.storage().instance().set(&DataKey::Claimed, &false);
 
         // Extend TTL
