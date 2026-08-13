@@ -90,8 +90,8 @@ npm run build
 
 - **Live Demo:** [Time-Capsule Bounty Box Live](https://time-cap-pink.vercel.app)
 - **Demo Video:** [1-2 Min Demo Video](YOUR_DEMO_VIDEO_URL_HERE)
-- **Deployed Registry Contract ID:** `CDQOSZ42BCERCFBGSFR7TRBP6LMBNWBM7OLZROWGBN56BYPEP57ZHZFT`
-- **Deployed Bounty Box Contract ID:** `CBZXDPWLE5OQ3CNBJCL4N35WLGQE4CLNK57PBF3QL5IAJPZ7F765YPGW`
+- **Deployed Registry Contract ID:** `CC6EL3IKGRTBJDR7SX2C6N5GHACL734AAKVIPTV4I2RWWERV3LQFUYUN`
+- **Deployed Bounty Box Contract ID:** `CD7AQW5EZH55IJC6YHLEIEMGPYAQOBX5QUDEX3FWRMP6CPX6KUMM7I3T`
 
 ---
 
