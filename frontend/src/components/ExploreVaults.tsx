@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox, RefreshCw } from 'lucide-react';
+import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
 import { hashSecret } from '../utils';
@@ -23,6 +23,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
   const [guess, setGuess] = useState('');
   const [loading, setLoading] = useState(false);
   const [pendingStep, setPendingStep] = useState<string>('');
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<string, boolean>>({});
   const [statusMsg, setStatusMsg] = useState<{
     type: 'error' | 'info';
     text: string;
@@ -34,6 +35,13 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     txHash: string;
   } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const togglePasswordVisibility = (bountyId: string) => {
+    setVisiblePasswords((prev) => ({
+      ...prev,
+      [bountyId]: !prev[bountyId],
+    }));
+  };
 
   const triggerConfetti = () => {
     confetti({
@@ -188,13 +196,29 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
               )}
 
               {bounty.solution && (
-                <div className="bg-emerald-950/30 border border-emerald-500/40 rounded-xl p-3 text-xs font-mono text-emerald-300 mb-3 flex items-center justify-between">
-                  <span className="text-emerald-400 font-semibold uppercase tracking-wider">
-                    🔑 Password:
-                  </span>
-                  <span className="bg-emerald-500/20 px-2 py-0.5 rounded text-white font-bold">
-                    {bounty.solution}
-                  </span>
+                <div className="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 text-xs font-mono text-indigo-300 mb-3 flex items-center justify-between shadow-inner">
+                  <div className="flex items-center space-x-1.5">
+                    <Key className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="text-gray-300 font-medium">Solution Key:</span>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <span className="bg-indigo-500/20 px-2.5 py-1 rounded-lg text-indigo-200 font-bold tracking-wide border border-indigo-500/30">
+                      {visiblePasswords[bounty.id] ? bounty.solution : '••••••••'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility(bounty.id)}
+                      className="p-1 rounded-md text-gray-400 hover:text-white hover:bg-indigo-500/20 transition-colors cursor-pointer"
+                      title={visiblePasswords[bounty.id] ? 'Hide Password' : 'Show Password'}
+                    >
+                      {visiblePasswords[bounty.id] ? (
+                        <EyeOff className="w-4 h-4 text-indigo-300" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
 
