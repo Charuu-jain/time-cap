@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox, RefreshCw } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
@@ -16,27 +16,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
   onClaimSuccess,
 }) => {
   const { walletAddress, signTx } = useWallet();
-  const [bounties, setBounties] = useState<BountyBox[]>(initialBountiesFromProps);
-
-  // Sync state when props change
-  useEffect(() => {
-    setBounties(initialBountiesFromProps);
-  }, [initialBountiesFromProps]);
-
-  // Fetch and render list of active bounties from localStorage on initial mount
-  useEffect(() => {
-    const saved = localStorage.getItem('timecap_bounties');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setBounties(parsed);
-        }
-      } catch (e) {
-        console.error('Error reading timecap_bounties from localStorage:', e);
-      }
-    }
-  }, []);
+  // State synced from parent props
+  const bounties = initialBountiesFromProps;
 
   const [selectedBounty, setSelectedBounty] = useState<BountyBox | null>(null);
   const [guess, setGuess] = useState('');

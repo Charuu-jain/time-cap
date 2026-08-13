@@ -15,7 +15,7 @@ export function AppContent() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed) && parsed.length >= INITIAL_BOUNTIES.length) {
           return parsed;
         }
       } catch (e) {
