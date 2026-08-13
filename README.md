@@ -84,3 +84,35 @@ npm run build
 - **Transaction Rejected by User**: Explicitly caught and displayed when the user cancels or denies the signature prompt in their wallet.
 - **Insufficient XLM Balance**: Simulation errors and missing funds/unfunded account errors are cleanly caught and presented in the UI.
 
+---
+
+## 🟢 Level 3 - Green Belt Certification
+
+- **Live Demo:** [Time-Capsule Bounty Box Live](https://time-cap-pink.vercel.app)
+- **Demo Video:** [1-2 Min Demo Video](YOUR_DEMO_VIDEO_URL_HERE)
+- **Deployed Registry Contract ID:** `CDQOSZ42BCERCFBGSFR7TRBP6LMBNWBM7OLZROWGBN56BYPEP57ZHZFT`
+- **Deployed Bounty Box Contract ID:** `CBZXDPWLE5OQ3CNBJCL4N35WLGQE4CLNK57PBF3QL5IAJPZ7F765YPGW`
+
+---
+
+### Cargo Unit Tests Output
+![Cargo Unit Tests Output](./cargo_output.png)
+
+---
+
+### GitHub Actions CI/CD Pipeline
+![GitHub Actions CI/CD Pipeline](./ci_cd.png)
+
+---
+
+### Mobile Responsive UI
+![Mobile Responsive UI](./ui_1.jpeg)
+
+---
+
+### Key Architectural Highlights
+- **Inter-Contract Communication (ICC)**: The `bounty_box` contract invokes cross-contract calls to the `registry` contract (`log_bounty`), logging every created bounty and its creator address directly into registry contract storage.
+- **Automated Rust Unit Testing**: Built a 3/3 passing test suite (`test_create_bounty_success`, `test_claim_bounty_success`, `test_claim_bounty_fail_wrong_password`) in `contracts/bounty_box/src/test.rs`.
+- **GitHub Actions CI/CD Workflow**: Configured automated `.github/workflows/ci.yml` pipeline that triggers on `push` and `pull_request` to run `cargo test` on contracts and `npm run build` on the frontend.
+
+
