@@ -1,5 +1,5 @@
 import { rpc, Contract, Address, nativeToScVal, xdr, TransactionBuilder } from '@stellar/stellar-sdk';
-import { CONTRACT_ID, XLM_TOKEN_ID } from './utils';
+import { CONTRACT_ID, REGISTRY_ID, XLM_TOKEN_ID } from './utils';
 
 const SOROBAN_RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
@@ -110,8 +110,9 @@ export async function submitCreateBounty({
     const creatorScVal = Address.fromString(creatorAddress).toScVal();
     const secretHashScVal = hexToBytesN32ScVal(secretHash);
     const amountScVal = nativeToScVal(amountStroops, { type: 'i128' });
+    const registryScVal = Address.fromString(REGISTRY_ID).toScVal();
 
-    const op = contract.call('create_bounty', tokenScVal, creatorScVal, secretHashScVal, amountScVal);
+    const op = contract.call('create_bounty', tokenScVal, creatorScVal, secretHashScVal, amountScVal, registryScVal);
 
     const tx = new TransactionBuilder(account, {
       fee: '10000',
