@@ -108,15 +108,16 @@ impl BountyBoxContract {
             return Err(Error::AlreadyClaimed);
         }
 
+        // Mark as claimed in persistent storage BEFORE token transfer (Checks-Effects-Interactions)
+        details.claimed = true;
+        env.storage().persistent().set(&bounty_key, &details);
+        env.storage().persistent().extend_ttl(&bounty_key, 100000, 100000);
+
         let token_client = token::Client::new(&env, &details.token);
         token_client.transfer(&env.current_contract_address(), &solver, &details.amount);
 
         // Emit Claimed event
         env.events().publish((symbol_short!("Claimed"), solver.clone()), details.amount);
-
-        details.claimed = true;
-        env.storage().persistent().set(&bounty_key, &details);
-        env.storage().persistent().extend_ttl(&bounty_key, 100000, 100000);
 
         Ok(true)
     }
