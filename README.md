@@ -106,7 +106,8 @@ npm run build
 ---
 
 ### Mobile Responsive UI
-![Mobile Responsive UI](./ui_1.jpeg)
+![Mobile Responsive UI Overview](./ui_1.jpeg)
+![Mobile Responsive Vault List](./ui_2.jpeg)
 
 ---
 
