@@ -69,13 +69,13 @@ npm run build
 
 - **Level 2 Deployed Contract ID**: `CBW7G2OLA2NB2LJNE2GG6M6BKLQNDKSFKX3OM3VBVDNCIZTRSMSY3VAI`
 
-### Multi-Wallet Selection Modal
-![Multi-Wallet Selection Modal](./multiwallet_modal.jpg)
+### Multi-Wallet Selection & DApp Interface
+![Multi-Wallet Selection & Interface](./ui_1.jpeg)
 
 ---
 
-### Live On-Chain Events Feed
-![Live On-Chain Events Feed](./activity_feed.jpg)
+### Live On-Chain Events Feed & Active Vaults
+![Live On-Chain Events Feed & Vaults](./ui_2.jpeg)
 
 ---
 
