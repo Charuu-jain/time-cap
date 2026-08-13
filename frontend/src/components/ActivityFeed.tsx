@@ -97,33 +97,33 @@ export const ActivityFeed: React.FC = () => {
   }, []);
 
   return (
-    <div className="glass-panel rounded-2xl p-6 border border-stellar-border shadow-xl mb-8">
-      <div className="flex items-center justify-between mb-4 pb-3 border-b border-stellar-border/60">
+    <div className="glass-panel rounded-2xl p-6 border border-slate-800/80 shadow-xl mb-8">
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800/60">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
             <Activity className="w-4 h-4 animate-pulse" />
           </div>
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
               Real-Time Contract Events <Sparkles className="w-4 h-4 text-amber-400" />
             </h3>
-            <p className="text-xs text-gray-400">Live Soroban event stream polling every 8s</p>
+            <p className="text-xs text-slate-400">Live Soroban event stream polling every 8s</p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 text-xs font-mono text-gray-400 bg-stellar-dark/60 px-3 py-1.5 rounded-full border border-stellar-border/60">
+        <div className="flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
           <Clock className="w-3.5 h-3.5 text-indigo-400" />
           <span>Last sync: {lastPolled}</span>
         </div>
       </div>
 
       {loading ? (
-        <div className="py-6 text-center text-xs font-mono text-gray-400 flex items-center justify-center space-x-2">
+        <div className="py-6 text-center text-xs font-mono text-slate-400 flex items-center justify-center space-x-2">
           <span className="w-4 h-4 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></span>
           <span>Polling Soroban Contract Event Logs...</span>
         </div>
       ) : events.length === 0 ? (
-        <div className="py-6 text-center text-xs text-gray-400 font-mono bg-stellar-dark/40 rounded-xl border border-stellar-border/40">
+        <div className="py-6 text-center text-xs text-slate-400 font-mono bg-slate-900/40 rounded-xl border border-slate-800/60">
           No contract events published yet on Testnet. Create or claim a vault to trigger events!
         </div>
       ) : (
@@ -131,7 +131,7 @@ export const ActivityFeed: React.FC = () => {
           {events.map((evt) => (
             <div
               key={evt.id}
-              className={`p-3 rounded-xl border flex items-center justify-between text-xs font-mono transition-all ${
+              className={`p-3 rounded-xl border flex items-center justify-between text-xs font-mono transition-all duration-200 ${
                 evt.type === 'Created'
                   ? 'bg-indigo-950/20 border-indigo-500/30 text-indigo-300'
                   : 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
@@ -147,14 +147,14 @@ export const ActivityFeed: React.FC = () => {
                   <span className="font-bold uppercase tracking-wider mr-2">
                     [{evt.type}]
                   </span>
-                  <span className="text-gray-300">
+                  <span className="text-slate-300">
                     {evt.type === 'Created' ? 'Bounty Vault Lock' : 'Vault Reward Claim'}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3 text-right">
-                <span className="text-gray-400">Account: {evt.account}</span>
+                <span className="text-slate-400">Account: {evt.account}</span>
                 <span className="font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
                   Ledger #{evt.ledger}
                 </span>
