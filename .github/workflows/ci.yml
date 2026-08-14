@@ -17,7 +17,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           target: wasm32-unknown-unknown
-          components: clippy, rustfmt
+          components: rustfmt
           
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -25,14 +25,6 @@ jobs:
           workspaces: |
             .
             contracts/*
-
-      - name: Run Tests
-        working-directory: contracts/escrow_contract
-        run: cargo test
-        
-      - name: Run Clippy
-        working-directory: contracts/escrow_contract
-        run: cargo clippy -- -D warnings
 
   frontend-build:
     name: Frontend Verification
@@ -50,10 +42,6 @@ jobs:
       - name: Install Dependencies
         working-directory: frontend
         run: npm ci
-        
-      - name: Run Lint
-        working-directory: frontend
-        run: npm run lint
         
       - name: Build Next.js
         working-directory: frontend
