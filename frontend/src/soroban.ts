@@ -41,6 +41,13 @@ export function categorizeError(err: any): string {
   ) {
     return 'Transaction Error: Transaction signing was rejected by user in Freighter.';
   }
+  if (
+    rawMsg.includes('UnreachableCodeReached') ||
+    rawMsg.includes('InvalidAction') ||
+    rawMsg.includes('HostError')
+  ) {
+    return 'Contract Verification: Unauthorized or invalid state. Only the original sponsor address can approve release or refund, and only the assigned builder can submit deliverables.';
+  }
 
   return rawMsg;
 }
