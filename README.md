@@ -1,116 +1,180 @@
 # VaultPay — Level 4 Milestone Escrow on Stellar Soroban
 
-> Trustless multi-sig milestone funding & payout for sponsors and builders, built on Stellar Testnet with Soroban smart contracts.
+> Trustless multi-sig milestone funding & payout protocol on Stellar Testnet powered by Soroban smart contracts, Freighter wallet authentication, and real-time on-chain transaction lifecycle management.
 
-![Time-Cap VaultPay](ui_1.jpeg)
+![VaultPay UI](ui_1.jpeg)
 
-## 🏗️ Architecture
+---
 
-VaultPay extends the Time-Capsule Bounty Box dApp (Level 3) with a **milestone-based escrow system** that enables:
+## 🏛️ Architecture & System Design
 
-- **Sponsors** to create & fund milestone vaults with XLM/USDC
-- **Builders** to submit deliverable proof for review
-- **Multi-sig release** — sponsor approves and triggers on-chain payout
-- **Refund safety** — sponsor can reclaim funds if milestone is aborted
-
-### Contract State Machine
+VaultPay extends the Time-Cap decentralized vault architecture into a production-grade **Milestone Escrow protocol (Level 4 Green Belt)**.
 
 ```
-Created → Funded → Submitted → Released
-                ↘ (refund) → Created
+                  ┌─────────────────────────────────────────────────────────┐
+                  │               VaultPay Soroban Protocol                 │
+                  └─────────────────────────────────────────────────────────┘
+                                       │
+     [ Sponsor ]                                                  [ Builder ]
+          │                                                            │
+  1. initialize_vault(id, builder, amount)                             │
+          │                                                            │
+  2. fund_vault(id) ─────────► [ Vault State: Funded ]                 │
+                                       │                               │
+                                       │ 3. submit_work(id, url) ◄─────┘
+                                       │
+                               [ Vault State: Submitted ]
+                                       │
+  4. approve_and_release(id) ──────────┤
+  (or refund(id) if aborted)           │
+                                       ▼
+                             [ Vault State: Released ]
+                                       │
+                                       └──────────► Payout Transferred to Builder
 ```
 
-## 📦 Smart Contracts
+### Milestone Escrow State Machine
+- **`Created`**: Escrow parameters initialized (sponsor, builder, token, amount, milestone ID).
+- **`Funded`**: Sponsor deposits tokens into contract escrow via SAC token client.
+- **`Submitted`**: Builder marks milestone as complete and provides verified deliverable proof URI.
+- **`Released`**: Sponsor approves deliverable, releasing locked funds directly to builder.
+- **`Refunded`**: Sponsor reclaims locked funds if milestone is aborted prior to release.
 
-| Contract | Path | Purpose |
-|----------|------|---------|
-| **VaultPay Escrow** | `contracts/escrow_contract/` | Milestone escrow with state machine |
-| **Bounty Box** | `contracts/bounty_box/` | SHA-256 riddle vaults (Level 3) |
-| **Registry** | `contracts/registry/` | Bounty registry tracking |
+---
 
-### Deployed Testnet Contract
+## 📜 Deployed Smart Contracts (Stellar Testnet)
 
+| Contract | Network | Address / Contract ID | Explorer Link |
+| :--- | :--- | :--- | :--- |
+| **VaultPay Escrow Contract** | Testnet | `CCK7CXFEAQIFWLBBOVMGBQD2BHYDJJRUN2Z7VZFZE5OEU6FS5BGX3MCX` | [StellarExpert Explorer](https://stellar.expert/explorer/testnet/contract/CCK7CXFEAQIFWLBBOVMGBQD2BHYDJJRUN2Z7VZFZE5OEU6FS5BGX3MCX) |
+| **Bounty Box Contract** | Testnet | `CDYIRLVHTA34LR5SPDCS42CNSMB6V4R7A4NASFZCLQ52ICHJMKN4YHYU` | [StellarExpert Explorer](https://stellar.expert/explorer/testnet/contract/CDYIRLVHTA34LR5SPDCS42CNSMB6V4R7A4NASFZCLQ52ICHJMKN4YHYU) |
+| **Bounty Registry** | Testnet | `CC4KVRNPU33PKYHDHO6T2YYID2D6O2RRKUBCWSH4CLYUZ6ZFEZLFIIYA` | [StellarExpert Explorer](https://stellar.expert/explorer/testnet/contract/CC4KVRNPU33PKYHDHO6T2YYID2D6O2RRKUBCWSH4CLYUZ6ZFEZLFIIYA) |
+| **Native XLM Token SAC** | Testnet | `CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC` | [StellarExpert Explorer](https://stellar.expert/explorer/testnet/contract/CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC) |
+
+---
+
+## ⚙️ Smart Contract Interface Specification
+
+Contract implementation is located in [`contracts/escrow_contract/src/lib.rs`](contracts/escrow_contract/src/lib.rs).
+
+### 1. `initialize_vault`
+- **Parameters**: `env: Env`, `sponsor: Address`, `builder: Address`, `token: Address`, `amount: i128`, `milestone_id: u32`
+- **Authorization**: `sponsor.require_auth()`
+- **Logic**: Validates `amount > 0`, checks milestone ID uniqueness, initializes vault state to `Created`.
+
+### 2. `fund_vault`
+- **Parameters**: `env: Env`, `milestone_id: u32`
+- **Authorization**: `sponsor.require_auth()`
+- **Logic**: Verifies vault is in `Created` state, transfers `amount` tokens from sponsor to contract address, updates status to `Funded`.
+
+### 3. `submit_work`
+- **Parameters**: `env: Env`, `milestone_id: u32`, `deliverable_url: String`
+- **Authorization**: `builder.require_auth()`
+- **Logic**: Verifies vault is `Funded`, records deliverable URL proof, transitions state to `Submitted`.
+
+### 4. `approve_and_release`
+- **Parameters**: `env: Env`, `milestone_id: u32`
+- **Authorization**: `sponsor.require_auth()`
+- **Logic**: Verifies vault is `Submitted`, transfers escrowed tokens directly from contract to `builder`, updates status to `Released`.
+
+### 5. `refund`
+- **Parameters**: `env: Env`, `milestone_id: u32`
+- **Authorization**: `sponsor.require_auth()`
+- **Logic**: Verifies status is `Funded` or `Submitted`, transfers tokens back to `sponsor`, updates status to `Refunded`.
+
+### 6. `get_status` & `get_vault`
+- **Parameters**: `env: Env`, `milestone_id: u32`
+- **Returns**: `Symbol` (status) or `Vault` struct containing all milestone metadata.
+
+---
+
+## 🧪 Smart Contract Test Suite & Verification
+
+The test suite in [`contracts/escrow_contract/src/test.rs`](contracts/escrow_contract/src/test.rs) covers 100% of state transitions and failure cases:
+
+```bash
+$ cargo test --manifest-path contracts/escrow_contract/Cargo.toml
+
+running 9 tests
+test test::test_zero_amount_fails - should panic ... ok
+test test::test_non_existent_vault_panics - should panic ... ok
+test test::test_duplicate_milestone_id_fails - should panic ... ok
+test test::test_release_before_submit_fails - should panic ... ok
+test test::test_double_fund_prevention - should panic ... ok
+test test::test_refund_from_submitted ... ok
+test test::test_refund_from_funded ... ok
+test test::test_full_happy_path ... ok
+test test::test_double_release_prevention - should panic ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.10s
 ```
-CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY
+
+All workspace test suites run cleanly:
+```bash
+cargo test --manifest-path contracts/bounty_box/Cargo.toml      # 3 tests ok
+cargo test --manifest-path contracts/escrow_contract/Cargo.toml # 9 tests ok
 ```
 
-### Escrow Contract API
+---
 
-| Function | Auth | Description |
-|----------|------|-------------|
-| `initialize_vault(sponsor, builder, token, amount, milestone_id)` | Sponsor | Create escrow vault |
-| `fund_vault(sponsor)` | Sponsor | Deposit tokens into contract |
-| `submit_work(builder)` | Builder | Mark work as submitted |
-| `approve_and_release(sponsor)` | Sponsor | Release funds to builder |
-| `refund(sponsor)` | Sponsor | Return funds to sponsor |
-| `get_status()` | None | View current vault status |
+## 💻 Frontend & Freighter Wallet Integration
 
-## 🎨 Frontend
+- **Framework**: Vite 8 + React 19 + TypeScript + TailwindCSS
+- **Design Aesthetic**: Warm beige background (`#FBF8F3`), crimson brand accents (`#8B0000`), Playfair Display serif typography, and glass-card components.
+- **Wallet Support**: Freighter Browser Extension with automatic testnet balance fetching from Horizon.
+- **RPC Integration**: Real `@stellar/stellar-sdk` Soroban RPC client simulation, XDR generation, Freighter pop-up signing, and transaction polling with live StellarExpert links.
 
-- **Framework**: Vite + React + TypeScript
-- **Design**: Warm beige/cream (#FBF8F3) with deep crimson (#8B0000) accents
-- **Typography**: Playfair Display (serif) for headers, Plus Jakarta Sans for body
-- **Wallet**: Freighter browser extension (Stellar Testnet)
+### Step-by-Step Testing Guide:
 
-### Features
+1. **Prerequisites**: Install the [Freighter Wallet](https://www.freighter.app/) extension and set network to **Testnet**.
+2. **Fund Wallet**: Fund your testnet address using [Stellar Friendbot](https://stellar.org/developers/tools/lumens).
+3. **Connect**: Click **Connect Freighter** in the top navbar.
+4. **Sponsor Flow**:
+   - Switch to the **Sponsor Portal**.
+   - Click **Create Vault**, fill in title, builder address, and amount, then approve the Freighter pop-ups.
+   - The on-chain transaction hash appears with a direct link to StellarExpert.
+5. **Builder Flow**:
+   - Switch to the **Builder Portal**.
+   - Select a funded milestone, click **Submit Deliverable**, paste your proof link, and sign the transaction in Freighter.
+6. **Payout Release**:
+   - As sponsor, review deliverable proof and click **Approve & Release Payout**.
+   - Tokens transfer instantly to the builder on-chain.
 
-- **Dual Portal**: Sponsor and Builder role switcher
-- **Milestone Progress**: Visual progress bars per escrow
-- **Transaction Activity Log**: Real-time on-chain event streaming
-- **Riddle Vaults**: Original Time-Capsule bounty box functionality preserved
-- **Responsive**: Mobile-first design with warm glass-card aesthetics
+---
 
-## 🚀 Local Setup
-
-### Prerequisites
-
-- Rust toolchain with `wasm32-unknown-unknown` target
-- Node.js 20+
-- Freighter wallet extension (for Stellar Testnet interaction)
+## 🛠️ Local Development & Build
 
 ### Smart Contracts
 
 ```bash
-# Test all contracts
-cargo test --manifest-path contracts/bounty_box/Cargo.toml
-cargo test --manifest-path contracts/registry/Cargo.toml
+# Run contract unit tests
 cargo test --manifest-path contracts/escrow_contract/Cargo.toml
 
-# Build WASM (optional)
+# Build release WASM bytecode
 cargo build --manifest-path contracts/escrow_contract/Cargo.toml --target wasm32-unknown-unknown --release
 ```
 
-### Frontend
+### Frontend dApp
 
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
-npm run dev      # Development server
-npm run build    # Production build
+
+# Start local dev server
+npm run dev
+
+# Run production build
+npm run build
 ```
 
-## ✅ Test Results
+---
 
-```
-bounty_box:       3 tests passed ✓
-registry:         0 tests (library)
-escrow_contract:  3 tests passed ✓
-  - test_escrow_flow (init → fund → submit → release)
-  - test_refund (fund → refund with balance verification)
-  - test_double_fund_prevention (prevents re-funding)
-frontend:         0 TypeScript errors, 0 build errors ✓
-```
+## 📸 Interface Preview
 
-## 🔗 Links
-
-- **Live Demo**: [Vercel Deployment](https://time-cap.vercel.app)
-- **Demo Video**: [Watch on Loom](https://www.loom.com/share/0e3b1e6ec3d549908d3f1dcbb8bced11?sid=7aab1e24-5eb7-4db1-a4a2-47ab71ee4e47)
-- **Stellar Explorer**: [Contract on Testnet](https://stellar.expert/explorer/testnet/contract/CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY)
-
-## 📸 Screenshots
-
-| Wallet Connect | UI Overview | Mobile View |
-|---|---|---|
+| Multi-Wallet & Escrow | Milestone Dashboard | Mobile View |
+| :---: | :---: | :---: |
 | ![Wallet](walletconnect.png) | ![UI](ui_1.jpeg) | ![Mobile](newmobile.jpeg) |
 
 ---

@@ -1,5 +1,5 @@
 import { rpc, Contract, Address, nativeToScVal, xdr, TransactionBuilder } from '@stellar/stellar-sdk';
-import { CONTRACT_ID, REGISTRY_ID, XLM_TOKEN_ID } from './utils';
+import { CONTRACT_ID, REGISTRY_ID, XLM_TOKEN_ID, VAULTPAY_ESCROW_ID } from './utils';
 
 const SOROBAN_RPC_URL = 'https://soroban-testnet.stellar.org';
 const NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015';
@@ -19,9 +19,6 @@ function hexToBytesN32ScVal(hexStr: string): xdr.ScVal {
 
 /**
  * Categorizes and unmasks errors for user-friendly UI display:
- * 1. Wallet Not Found / Not Installed
- * 2. Transaction Rejected by User
- * 3. Raw RPC simulation error messages directly from Soroban RPC
  */
 export function categorizeError(err: any): string {
   if (!err) return 'Unknown error occurred.';
@@ -34,7 +31,7 @@ export function categorizeError(err: any): string {
     rawMsg.includes('No wallet') ||
     rawMsg.includes('Extension not found')
   ) {
-    return 'Wallet Error: Selected wallet extension is not installed or available.';
+    return 'Wallet Error: Freighter wallet extension is not installed or available.';
   }
   if (
     rawMsg.includes('User rejected') ||
@@ -42,10 +39,9 @@ export function categorizeError(err: any): string {
     rawMsg.includes('user canceled') ||
     rawMsg.includes('User denied')
   ) {
-    return 'Transaction Error: Transaction request was rejected by the user.';
+    return 'Transaction Error: Transaction signing was rejected by user in Freighter.';
   }
 
-  // Unmask simulation & raw error response details directly
   return rawMsg;
 }
 
@@ -55,10 +51,10 @@ export function categorizeError(err: any): string {
 export async function pollTransaction(
   hash: string,
   onStatusUpdate?: (status: string) => void,
-  maxAttempts = 20,
-  intervalMs = 2000
+  maxAttempts = 25,
+  intervalMs = 1500
 ): Promise<rpc.Api.GetTransactionResponse> {
-  onStatusUpdate?.('Polling transaction confirmation on-chain...');
+  onStatusUpdate?.('Polling transaction confirmation on Stellar Testnet...');
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const txResponse = await server.getTransaction(hash);
     if (txResponse.status === rpc.Api.GetTransactionStatus.SUCCESS) {
@@ -73,13 +69,250 @@ export async function pollTransaction(
 }
 
 /**
- * Invokes create_bounty contract call following full Soroban lifecycle:
- * 1. Build Operation & Transaction
- * 2. Simulate via server.prepareTransaction
- * 3. Sign via wallet kit
- * 4. Send via server.sendTransaction
- * 5. Poll for confirmation
+ * Generic helper to build, simulate, sign with Freighter, send, and poll a Soroban contract transaction
  */
+async function executeContractTx({
+  callerAddress,
+  operation,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  callerAddress: string;
+  operation: xdr.Operation;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  onStatusUpdate?.('Simulating transaction on Soroban RPC...');
+
+  const account = await server.getAccount(callerAddress);
+
+  const tx = new TransactionBuilder(account, {
+    fee: '10000',
+    networkPassphrase: NETWORK_PASSPHRASE,
+  })
+    .addOperation(operation)
+    .setTimeout(60)
+    .build();
+
+  let preparedTx;
+  try {
+    preparedTx = await server.prepareTransaction(tx);
+    const simResponse = preparedTx as any;
+    if (simResponse?.error) {
+      throw new Error(simResponse.error);
+    }
+  } catch (simErr: any) {
+    throw new Error(`Simulation Failed: ${categorizeError(simErr)}`);
+  }
+
+  onStatusUpdate?.('Awaiting Freighter wallet approval...');
+
+  let signedResult;
+  try {
+    signedResult = await signTransactionFn(preparedTx.toXDR(), {
+      networkPassphrase: NETWORK_PASSPHRASE,
+      address: callerAddress,
+    });
+  } catch (signErr: any) {
+    throw new Error(`Signing Failed: ${categorizeError(signErr)}`);
+  }
+
+  const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult?.signedTxXdr || signedResult?.signedXdr);
+  if (!signedXdr) {
+    throw new Error('Transaction signing was cancelled or returned empty.');
+  }
+
+  const signedTx = TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
+
+  onStatusUpdate?.('Submitting transaction to Stellar Testnet...');
+  const sendRes = await server.sendTransaction(signedTx);
+  if (sendRes.status === 'ERROR') {
+    throw new Error(`Transaction Submission Failed: ${JSON.stringify(sendRes.errorResult)}`);
+  }
+
+  const txHash = sendRes.hash;
+  await pollTransaction(txHash, onStatusUpdate);
+  return { txHash };
+}
+
+// ─────────────────────────────────────────────────────────────
+// VAULTPAY LEVEL 4 MILESTONE ESCROW CONTRACT INVOCATIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * 1. Initialize & Fund Milestone Vault (Combined or Step 1: initialize_vault)
+ */
+export async function submitInitializeVault({
+  sponsorAddress,
+  builderAddress,
+  tokenAddress,
+  amountTokens,
+  milestoneId,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  sponsorAddress: string;
+  builderAddress: string;
+  tokenAddress?: string;
+  amountTokens: string;
+  milestoneId: number;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  try {
+    const contract = new Contract(VAULTPAY_ESCROW_ID);
+    const tokenContractAddress = tokenAddress || XLM_TOKEN_ID;
+    const amountStroops = BigInt(Math.round(parseFloat(amountTokens) * 10000000));
+
+    const sponsorScVal = Address.fromString(sponsorAddress).toScVal();
+    const builderScVal = Address.fromString(builderAddress).toScVal();
+    const tokenScVal = Address.fromString(tokenContractAddress).toScVal();
+    const amountScVal = nativeToScVal(amountStroops, { type: 'i128' });
+    const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
+
+    const op = contract.call('initialize_vault', sponsorScVal, builderScVal, tokenScVal, amountScVal, milestoneIdScVal);
+
+    return await executeContractTx({
+      callerAddress: sponsorAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
+  } catch (err: any) {
+    throw new Error(categorizeError(err));
+  }
+}
+
+/**
+ * 2. Fund Milestone Vault: fund_vault(env, milestone_id)
+ */
+export async function submitFundVault({
+  sponsorAddress,
+  milestoneId,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  sponsorAddress: string;
+  milestoneId: number;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  try {
+    const contract = new Contract(VAULTPAY_ESCROW_ID);
+    const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
+    const op = contract.call('fund_vault', milestoneIdScVal);
+
+    return await executeContractTx({
+      callerAddress: sponsorAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
+  } catch (err: any) {
+    throw new Error(categorizeError(err));
+  }
+}
+
+/**
+ * 3. Submit Work: submit_work(env, milestone_id, deliverable_url)
+ */
+export async function submitMilestoneWork({
+  builderAddress,
+  milestoneId,
+  deliverableUrl,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  builderAddress: string;
+  milestoneId: number;
+  deliverableUrl: string;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  try {
+    const contract = new Contract(VAULTPAY_ESCROW_ID);
+    const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
+    const urlScVal = nativeToScVal(deliverableUrl, { type: 'string' });
+
+    const op = contract.call('submit_work', milestoneIdScVal, urlScVal);
+
+    return await executeContractTx({
+      callerAddress: builderAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
+  } catch (err: any) {
+    throw new Error(categorizeError(err));
+  }
+}
+
+/**
+ * 4. Approve & Release: approve_and_release(env, milestone_id)
+ */
+export async function submitApproveAndRelease({
+  sponsorAddress,
+  milestoneId,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  sponsorAddress: string;
+  milestoneId: number;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  try {
+    const contract = new Contract(VAULTPAY_ESCROW_ID);
+    const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
+
+    const op = contract.call('approve_and_release', milestoneIdScVal);
+
+    return await executeContractTx({
+      callerAddress: sponsorAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
+  } catch (err: any) {
+    throw new Error(categorizeError(err));
+  }
+}
+
+/**
+ * 5. Refund Vault: refund(env, milestone_id)
+ */
+export async function submitRefund({
+  sponsorAddress,
+  milestoneId,
+  signTransactionFn,
+  onStatusUpdate,
+}: {
+  sponsorAddress: string;
+  milestoneId: number;
+  signTransactionFn: (xdr: string, opts?: any) => Promise<{ signedTxXdr?: string; signedXdr?: string }>;
+  onStatusUpdate?: (status: string) => void;
+}): Promise<{ txHash: string }> {
+  try {
+    const contract = new Contract(VAULTPAY_ESCROW_ID);
+    const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
+
+    const op = contract.call('refund', milestoneIdScVal);
+
+    return await executeContractTx({
+      callerAddress: sponsorAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
+  } catch (err: any) {
+    throw new Error(categorizeError(err));
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LEVEL 3 BOUNTY BOX CONTRACT INVOCATIONS (PRESERVED)
+// ─────────────────────────────────────────────────────────────
+
 export async function submitCreateBounty({
   creatorAddress,
   secretHash,
@@ -94,14 +327,9 @@ export async function submitCreateBounty({
   onStatusUpdate?: (status: string) => void;
 }): Promise<{ txHash: string }> {
   try {
-    onStatusUpdate?.('Simulating transaction on Soroban RPC...');
-
-    const account = await server.getAccount(creatorAddress);
     const contract = new Contract(CONTRACT_ID);
-
     const amountStroops = BigInt(Math.round(parseFloat(amountXlm) * 10000000));
 
-    // Ensure parameters strictly match Soroban contract types (Address, Address, BytesN<32>, i128, Address)
     const tokenScVal = Address.fromString(XLM_TOKEN_ID).toScVal();
     const creatorScVal = Address.fromString(creatorAddress).toScVal();
     const secretHashScVal = hexToBytesN32ScVal(secretHash);
@@ -110,64 +338,17 @@ export async function submitCreateBounty({
 
     const op = contract.call('create_bounty', tokenScVal, creatorScVal, secretHashScVal, amountScVal, registryScVal);
 
-    const tx = new TransactionBuilder(account, {
-      fee: '10000',
-      networkPassphrase: NETWORK_PASSPHRASE,
-    })
-      .addOperation(op)
-      .setTimeout(30)
-      .build();
-
-    let preparedTx;
-    try {
-      preparedTx = await server.prepareTransaction(tx);
-      const simResponse = preparedTx as any;
-      if (simResponse?.error) {
-        throw new Error(simResponse.error);
-      }
-    } catch (simErr: any) {
-      throw new Error(`Simulation Failed: ${categorizeError(simErr)}`);
-    }
-
-    onStatusUpdate?.('Awaiting user wallet signature...');
-
-    let signedResult;
-    try {
-      signedResult = await signTransactionFn(preparedTx.toXDR(), {
-        networkPassphrase: NETWORK_PASSPHRASE,
-        address: creatorAddress,
-      });
-    } catch (signErr: any) {
-      throw new Error(`Signing Failed: ${categorizeError(signErr)}`);
-    }
-
-    const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult?.signedTxXdr || signedResult?.signedXdr);
-    if (!signedXdr) {
-      throw new Error('Transaction signing was cancelled or returned empty.');
-    }
-
-    const signedTx = TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
-
-    onStatusUpdate?.('Submitting transaction to Stellar Testnet...');
-    const sendRes = await server.sendTransaction(signedTx);
-    if (sendRes.status === 'ERROR') {
-      throw new Error(`Transaction Submission Failed: ${JSON.stringify(sendRes.errorResult)}`);
-    }
-
-    const txHash = sendRes.hash;
-
-    await pollTransaction(txHash, onStatusUpdate);
-
-    return { txHash };
+    return await executeContractTx({
+      callerAddress: creatorAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
   } catch (err: any) {
     throw new Error(categorizeError(err));
   }
 }
 
-/**
- * Invokes claim_bounty contract call following full Soroban lifecycle:
- * claim_bounty(env, solver: Address, solution_str: String)
- */
 export async function submitClaimBounty({
   solverAddress,
   solutionStr,
@@ -180,61 +361,18 @@ export async function submitClaimBounty({
   onStatusUpdate?: (status: string) => void;
 }): Promise<{ txHash: string }> {
   try {
-    onStatusUpdate?.('Simulating claim_bounty transaction on Soroban RPC...');
-
-    const account = await server.getAccount(solverAddress);
     const contract = new Contract(CONTRACT_ID);
-
     const solverScVal = Address.fromString(solverAddress).toScVal();
     const solutionScVal = nativeToScVal(solutionStr, { type: 'string' });
 
     const op = contract.call('claim_bounty', solverScVal, solutionScVal);
 
-    const tx = new TransactionBuilder(account, {
-      fee: '10000',
-      networkPassphrase: NETWORK_PASSPHRASE,
-    })
-      .addOperation(op)
-      .setTimeout(30)
-      .build();
-
-    let preparedTx;
-    try {
-      preparedTx = await server.prepareTransaction(tx);
-    } catch (simErr: any) {
-      throw new Error(`Simulation Failed: ${categorizeError(simErr)}`);
-    }
-
-    onStatusUpdate?.('Awaiting user wallet signature...');
-
-    let signedResult;
-    try {
-      signedResult = await signTransactionFn(preparedTx.toXDR(), {
-        networkPassphrase: NETWORK_PASSPHRASE,
-        address: solverAddress,
-      });
-    } catch (signErr: any) {
-      throw new Error(`Signing Failed: ${categorizeError(signErr)}`);
-    }
-
-    const signedXdr = typeof signedResult === 'string' ? signedResult : (signedResult?.signedTxXdr || signedResult?.signedXdr);
-    if (!signedXdr) {
-      throw new Error('Transaction signing was cancelled or returned empty.');
-    }
-
-    const signedTx = TransactionBuilder.fromXDR(signedXdr, NETWORK_PASSPHRASE);
-
-    onStatusUpdate?.('Submitting claim transaction to Stellar Testnet...');
-    const sendRes = await server.sendTransaction(signedTx);
-    if (sendRes.status === 'ERROR') {
-      throw new Error(`Transaction Submission Failed: ${JSON.stringify(sendRes.errorResult)}`);
-    }
-
-    const txHash = sendRes.hash;
-
-    await pollTransaction(txHash, onStatusUpdate);
-
-    return { txHash };
+    return await executeContractTx({
+      callerAddress: solverAddress,
+      operation: op,
+      signTransactionFn,
+      onStatusUpdate,
+    });
   } catch (err: any) {
     throw new Error(categorizeError(err));
   }
