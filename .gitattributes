@@ -1,0 +1,6 @@
+Makefile linguist-vendored
+*.mk linguist-vendored
+Makefile linguist-detectable=false
+contracts/target/** linguist-vendored
+frontend/.next/** linguist-vendored
+frontend/dist/** linguist-vendored
