@@ -37,3 +37,9 @@ The system consists of two main components:
 
 ## 📈 Analytics & Monitoring
 The application utilizes PostHog for crash analytics and user transaction funnel monitoring. An ErrorBoundary catches unforeseen wallet exception crashes to maintain a smooth user experience.
+
+---
+
+## ⏳ Level 3: Time-Capsule Bounty Box
+The previous iteration of this repository housed the **Time-Capsule Bounty Box**, a Level 3 milestone project. All historical documentation, specifications, and deployed contract proof for that project have been safely preserved.
+👉 **[View Level 3 Documentation (README_LEVEL3.md)](./README_LEVEL3.md)**
