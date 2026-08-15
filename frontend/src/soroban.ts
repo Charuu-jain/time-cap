@@ -103,12 +103,19 @@ async function executeContractTx({
 
   let preparedTx;
   try {
+    const sim = await server.simulateTransaction(tx);
+    console.log('[Soroban Simulation Result]:', sim);
+    if (rpc.Api.isSimulationError(sim)) {
+      console.error('[Soroban Simulation Error Details]:', sim.error, sim.events);
+      throw new Error(sim.error || 'Simulation returned an error on Soroban RPC.');
+    }
     preparedTx = await server.prepareTransaction(tx);
     const simResponse = preparedTx as any;
     if (simResponse?.error) {
       throw new Error(simResponse.error);
     }
   } catch (simErr: any) {
+    console.error('[Soroban Prepare Error]:', simErr);
     throw new Error(`Simulation Failed: ${categorizeError(simErr)}`);
   }
 
@@ -121,6 +128,7 @@ async function executeContractTx({
       address: callerAddress,
     });
   } catch (signErr: any) {
+    console.error('[Freighter Signing Error]:', signErr);
     throw new Error(`Signing Failed: ${categorizeError(signErr)}`);
   }
 
@@ -134,10 +142,12 @@ async function executeContractTx({
   onStatusUpdate?.('Submitting transaction to Stellar Testnet...');
   const sendRes = await server.sendTransaction(signedTx);
   if (sendRes.status === 'ERROR') {
+    console.error('[Soroban Send Error]:', sendRes.errorResult);
     throw new Error(`Transaction Submission Failed: ${JSON.stringify(sendRes.errorResult)}`);
   }
 
   const txHash = sendRes.hash;
+  console.log('[Soroban Confirmed Broadcast TX Hash]:', txHash);
   await pollTransaction(txHash, onStatusUpdate);
   return { txHash };
 }
@@ -237,6 +247,12 @@ export async function submitMilestoneWork({
   onStatusUpdate?: (status: string) => void;
 }): Promise<{ txHash: string }> {
   try {
+    console.log('[submitMilestoneWork] Invoking submit_work with ScVal parameters:', {
+      contractId: VAULTPAY_ESCROW_ID,
+      builderAddress,
+      milestoneId,
+      deliverableUrl,
+    });
     const contract = new Contract(VAULTPAY_ESCROW_ID);
     const milestoneIdScVal = nativeToScVal(milestoneId, { type: 'u32' });
     const urlScVal = nativeToScVal(deliverableUrl, { type: 'string' });
