@@ -20,38 +20,34 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="border-b border-stone-200/80 bg-[#F9F6F0]/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4 transition-all">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Typography-Based Serif Logo */}
-        <div className="flex items-center space-x-3">
-          <span className="font-serif text-2xl font-normal text-rose-900 tracking-widest">
-            Vault.
+    <nav className="border-b border-[#E5DCCB] bg-[#FBF8F3]/92 backdrop-blur-md sticky top-0 z-50 px-6 py-3.5 transition-all">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* VaultPay Logo — Playfair Display */}
+        <div className="flex items-center gap-3">
+          <span className="font-playfair text-[1.65rem] font-semibold tracking-wide text-[#8B0000] leading-none">
+            VaultPay
           </span>
-          <span className="bg-rose-900/10 text-rose-900 text-xs px-2.5 py-0.5 rounded-full border border-rose-900/20 font-mono font-medium">
-            Time-Capsule
-          </span>
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#8B0000]/6 border border-[#8B0000]/15">
+            <span className="w-[6px] h-[6px] rounded-full bg-emerald-600 vp-pulse-dot"></span>
+            <span className="text-[0.65rem] font-mono font-medium text-[#8B0000]/80">Stellar Testnet</span>
+          </div>
         </div>
 
-        {/* Status / Connect Button */}
-        <div className="flex items-center space-x-4">
-          <div className="hidden sm:flex items-center px-3 py-1.5 rounded-full bg-stone-200/60 border border-stone-300 text-stone-700 text-xs font-mono font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 mr-2"></span>
-            Stellar Testnet
-          </div>
-
+        {/* Wallet Connection */}
+        <div className="flex items-center gap-3">
           {isConnected && walletAddress ? (
-            <div className="flex items-center space-x-3 bg-white border border-stone-200 rounded-xl p-1.5 pl-4 shadow-sm">
-              <div className="flex flex-col text-right">
-                <span className="text-xs font-mono font-medium text-stone-800">
-                  {walletAddress.slice(0, 5)}...{walletAddress.slice(-5)}
+            <div className="flex items-center gap-2.5 bg-[#FFFDF9] border border-[#E5DCCB] rounded-xl px-1.5 py-1.5 pl-4 shadow-sm">
+              <div className="flex flex-col text-right leading-tight">
+                <span className="text-[0.7rem] font-mono font-medium text-stone-700">
+                  {walletAddress.slice(0, 5)}…{walletAddress.slice(-5)}
                 </span>
-                <span className="text-xs font-mono text-rose-900 font-semibold">
-                  {balance ? `${balance} XLM` : 'Loading...'}
+                <span className="text-[0.7rem] font-mono text-[#8B0000] font-bold">
+                  {balance ? `${balance} XLM` : '…'}
                 </span>
               </div>
               <button
                 onClick={disconnectWallet}
-                className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-900 text-xs font-medium rounded-lg transition-opacity duration-300 cursor-pointer"
+                className="px-2.5 py-1.5 bg-[#8B0000]/5 hover:bg-[#8B0000]/10 border border-[#8B0000]/15 text-[#8B0000] text-[0.7rem] font-medium rounded-lg transition-all cursor-pointer"
               >
                 Disconnect
               </button>
@@ -59,9 +55,9 @@ export const Navbar: React.FC = () => {
           ) : (
             <button
               onClick={handleConnect}
-              className="flex items-center space-x-2 px-5 py-2.5 bg-rose-900 hover:bg-rose-800 text-stone-50 font-medium text-sm rounded-xl border border-rose-900/20 transition-opacity duration-300 cursor-pointer shadow-sm"
+              className="vp-btn-primary"
             >
-              <Wallet className="w-4 h-4 text-stone-100" />
+              <Wallet className="w-4 h-4" />
               <span>Connect Freighter</span>
             </button>
           )}

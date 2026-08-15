@@ -1,8 +1,9 @@
-import type { BountyBox } from './types';
+import type { BountyBox, MilestoneEscrow } from './types';
 
 export const CONTRACT_ID = 'CDYIRLVHTA34LR5SPDCS42CNSMB6V4R7A4NASFZCLQ52ICHJMKN4YHYU';
 export const REGISTRY_ID = 'CC4KVRNPU33PKYHDHO6T2YYID2D6O2RRKUBCWSH4CLYUZ6ZFEZLFIIYA';
 export const XLM_TOKEN_ID = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
+export const VAULTPAY_ESCROW_ID = 'CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY';
 
 export const INITIAL_BOUNTIES: BountyBox[] = [
   {
@@ -148,6 +149,54 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     claimed: false,
     secretHash: '7021eb199b50db084803923efcf9ffea5561a35ae4f3f1e967fa71c1103f1ebf', // SHA256 of "SAC"
     createdAt: Date.now() - 3600000 * 14,
+  }
+];
+
+export const INITIAL_MILESTONES: MilestoneEscrow[] = [
+  {
+    id: 'milestone-1',
+    contractId: VAULTPAY_ESCROW_ID,
+    title: 'Frontend UI Redesign & Red-Beige Theme Integration',
+    description: 'Implement responsive sponsor-builder dashboard with authentic Time-Cap visual tokens.',
+    sponsor: 'GBX4...9KL2',
+    builder: 'GA7P...3MN1',
+    amount: '1200',
+    tokenSymbol: 'XLM',
+    status: 'funded',
+    workLink: 'https://github.com/Charuu-jain/time-cap/pull/4',
+    workNotes: 'Completed full component migration and verified design fidelity across viewports.',
+    createdAt: Date.now() - 3600000 * 36,
+    updatedAt: Date.now() - 3600000 * 12,
+  },
+  {
+    id: 'milestone-2',
+    contractId: VAULTPAY_ESCROW_ID,
+    title: 'Soroban Multi-Sig Escrow Contract Deployment',
+    description: 'Deploy milestone escrow smart contract with require_auth() checks on Stellar Testnet.',
+    sponsor: 'GDF9...8QQ4',
+    builder: 'GBK9...1AA4',
+    amount: '2500',
+    tokenSymbol: 'XLM',
+    status: 'work_submitted',
+    workLink: 'https://stellar.expert/explorer/testnet/contract/' + VAULTPAY_ESCROW_ID,
+    workNotes: 'Contract initialized, funded, and pass 4 unit tests cleanly.',
+    createdAt: Date.now() - 3600000 * 48,
+    updatedAt: Date.now() - 3600000 * 4,
+  },
+  {
+    id: 'milestone-3',
+    contractId: VAULTPAY_ESCROW_ID,
+    title: 'Freighter Multi-Wallet Transaction Signing & Telemetry',
+    description: 'Wire up real-time status notifications and wallet balance refreshes post-release.',
+    sponsor: 'GCM3...7KK8',
+    builder: 'GD77...2MM9',
+    amount: '800',
+    tokenSymbol: 'USDC',
+    status: 'released',
+    workLink: 'https://stellar.expert/explorer/testnet/tx/1cc1d77',
+    workNotes: 'Verified funds release with multi-sig auth and PostHog transaction tracking.',
+    createdAt: Date.now() - 3600000 * 72,
+    updatedAt: Date.now() - 3600000 * 24,
   }
 ];
 

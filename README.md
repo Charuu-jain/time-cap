@@ -1,118 +1,118 @@
-# Time-Capsule Bounty Box 🎁🔒
+# VaultPay — Level 4 Milestone Escrow on Stellar Soroban
 
-A production-ready full-stack Soroban dApp built on the **Stellar Testnet** where creators lock XLM rewards inside cryptographic time-capsule vaults, and players attempt to solve riddles to claim the on-chain bounties.
+> Trustless multi-sig milestone funding & payout for sponsors and builders, built on Stellar Testnet with Soroban smart contracts.
 
----
+![Time-Cap VaultPay](ui_1.jpeg)
 
-## 🌟 Overview & Architecture
+## 🏗️ Architecture
 
-- **Smart Contract (`/contracts/bounty_box`)**: Written in Rust using Soroban SDK (`no_std`). Stores SHA-256 password hash, creator address, total bounty XLM amount, and claim status in storage instance.
-- **Frontend (`/frontend`)**: Built with React, Vite, TypeScript, Tailwind CSS, `@stellar/freighter-api`, and `@stellar/stellar-sdk`. Features SHA-256 pre-hashing via browser Web Crypto API and interactive confetti claim feedback.
+VaultPay extends the Time-Capsule Bounty Box dApp (Level 3) with a **milestone-based escrow system** that enables:
 
----
+- **Sponsors** to create & fund milestone vaults with XLM/USDC
+- **Builders** to submit deliverable proof for review
+- **Multi-sig release** — sponsor approves and triggers on-chain payout
+- **Refund safety** — sponsor can reclaim funds if milestone is aborted
 
-## 🚀 Local Setup & Development
+### Contract State Machine
 
-### 1. Smart Contract (Rust / Soroban)
-Prerequisites: Rust toolchain and Stellar CLI installed.
-
-```bash
-cd contracts/bounty_box
-cargo build
-stellar contract build
+```
+Created → Funded → Submitted → Released
+                ↘ (refund) → Created
 ```
 
-### 2. Frontend Application (React + Vite)
-Prerequisites: Node.js (v18+) and npm.
+## 📦 Smart Contracts
+
+| Contract | Path | Purpose |
+|----------|------|---------|
+| **VaultPay Escrow** | `contracts/escrow_contract/` | Milestone escrow with state machine |
+| **Bounty Box** | `contracts/bounty_box/` | SHA-256 riddle vaults (Level 3) |
+| **Registry** | `contracts/registry/` | Bounty registry tracking |
+
+### Deployed Testnet Contract
+
+```
+CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY
+```
+
+### Escrow Contract API
+
+| Function | Auth | Description |
+|----------|------|-------------|
+| `initialize_vault(sponsor, builder, token, amount, milestone_id)` | Sponsor | Create escrow vault |
+| `fund_vault(sponsor)` | Sponsor | Deposit tokens into contract |
+| `submit_work(builder)` | Builder | Mark work as submitted |
+| `approve_and_release(sponsor)` | Sponsor | Release funds to builder |
+| `refund(sponsor)` | Sponsor | Return funds to sponsor |
+| `get_status()` | None | View current vault status |
+
+## 🎨 Frontend
+
+- **Framework**: Vite + React + TypeScript
+- **Design**: Warm beige/cream (#FBF8F3) with deep crimson (#8B0000) accents
+- **Typography**: Playfair Display (serif) for headers, Plus Jakarta Sans for body
+- **Wallet**: Freighter browser extension (Stellar Testnet)
+
+### Features
+
+- **Dual Portal**: Sponsor and Builder role switcher
+- **Milestone Progress**: Visual progress bars per escrow
+- **Transaction Activity Log**: Real-time on-chain event streaming
+- **Riddle Vaults**: Original Time-Capsule bounty box functionality preserved
+- **Responsive**: Mobile-first design with warm glass-card aesthetics
+
+## 🚀 Local Setup
+
+### Prerequisites
+
+- Rust toolchain with `wasm32-unknown-unknown` target
+- Node.js 20+
+- Freighter wallet extension (for Stellar Testnet interaction)
+
+### Smart Contracts
+
+```bash
+# Test all contracts
+cargo test --manifest-path contracts/bounty_box/Cargo.toml
+cargo test --manifest-path contracts/registry/Cargo.toml
+cargo test --manifest-path contracts/escrow_contract/Cargo.toml
+
+# Build WASM (optional)
+cargo build --manifest-path contracts/escrow_contract/Cargo.toml --target wasm32-unknown-unknown --release
+```
+
+### Frontend
 
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev      # Development server
+npm run build    # Production build
 ```
 
-To verify production bundle build:
-```bash
-npm run build
+## ✅ Test Results
+
+```
+bounty_box:       3 tests passed ✓
+registry:         0 tests (library)
+escrow_contract:  3 tests passed ✓
+  - test_escrow_flow (init → fund → submit → release)
+  - test_refund (fund → refund with balance verification)
+  - test_double_fund_prevention (prevents re-funding)
+frontend:         0 TypeScript errors, 0 build errors ✓
 ```
 
----
+## 🔗 Links
 
-## 📸 Level 1 Certification: Screenshots & Proof of Operation
+- **Live Demo**: [Vercel Deployment](https://time-cap.vercel.app)
+- **Demo Video**: [Watch on Loom](https://www.loom.com/share/0e3b1e6ec3d549908d3f1dcbb8bced11?sid=7aab1e24-5eb7-4db1-a4a2-47ab71ee4e47)
+- **Stellar Explorer**: [Contract on Testnet](https://stellar.expert/explorer/testnet/contract/CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY)
 
-- **Deployed Testnet Contract ID**: `CAF2ZEJTU6W7CQ32B7QJAY4F74LDEMEQODJY5SY2FWVRKGD4ZOTPDVJT`
-- **Successful Transaction Hash**: `25329ecf92ed8026566c518e85cecd4fa8860169b74e0d8af6de80d61479f8b9`
+## 📸 Screenshots
 
----
-
-### 1. Wallet Connected
-![Wallet Connected](./walletconnect.png)
-
----
-
-### 2. Balance Displayed
-![Balance Displayed](./balance.png)
+| Wallet Connect | UI Overview | Mobile View |
+|---|---|---|
+| ![Wallet](walletconnect.png) | ![UI](ui_1.jpeg) | ![Mobile](newmobile.jpeg) |
 
 ---
 
-### 3. Successful Testnet Transaction
-![Successful Testnet Transaction](./walletdialog.png)
-
----
-
-### 4. Transaction Result / Hash
-![Transaction Result / Hash](./transaction.png)
-
----
-
-## 🟡 Level 2 - Yellow Belt Certification
-
-- **Level 2 Deployed Contract ID**: `CBW7G2OLA2NB2LJNE2GG6M6BKLQNDKSFKX3OM3VBVDNCIZTRSMSY3VAI`
-
-### Multi-Wallet Selection & DApp Interface
-![Multi-Wallet Selection & Interface](./ui_1.jpeg)
-
----
-
-### Live On-Chain Events Feed & Active Vaults
-![Live On-Chain Events Feed & Vaults](./ui_2.jpeg)
-
----
-
-### Handled Error Scenarios
-- **Wallet Not Found / Not Installed**: Detected when a user attempts to interact without an available extension module.
-- **Transaction Rejected by User**: Explicitly caught and displayed when the user cancels or denies the signature prompt in their wallet.
-- **Insufficient XLM Balance**: Simulation errors and missing funds/unfunded account errors are cleanly caught and presented in the UI.
-
----
-
-## 🟢 Level 3 - Green Belt Certification
-
-- **Live Demo:** [Time-Capsule Bounty Box Live](https://time-cap-pink.vercel.app)
-- **Demo Video:** [1-2 Min Demo Video](https://drive.google.com/file/d/1EdSsFJP_vndZp4mBnFaOFu6BHXCKJ-vF/view?usp=drivesdk)
-- **Deployed Registry Contract ID:** `CC4KVRNPU33PKYHDHO6T2YYID2D6O2RRKUBCWSH4CLYUZ6ZFEZLFIIYA`
-- **Deployed Bounty Box Contract ID:** `CDYIRLVHTA34LR5SPDCS42CNSMB6V4R7A4NASFZCLQ52ICHJMKN4YHYU`
-
----
-
-### Cargo Unit Tests Output
-![Cargo Unit Tests Output](./cargo_output.png)
-
----
-
-### GitHub Actions CI/CD Pipeline
-![GitHub Actions CI/CD Pipeline](./ci_cd.png)
-
----
-
-### Mobile Responsive UI
-![Mobile Responsive UI](./newmobile.jpeg)
-
----
-
-### Key Architectural Highlights
-- **Inter-Contract Communication (ICC)**: The `bounty_box` contract invokes cross-contract calls to the `registry` contract (`log_bounty`), logging every created bounty and its creator address directly into registry contract storage.
-- **Automated Rust Unit Testing**: Built a 3/3 passing test suite (`test_create_bounty_success`, `test_claim_bounty_success`, `test_claim_bounty_fail_wrong_password`) in `contracts/bounty_box/src/test.rs`.
-- **GitHub Actions CI/CD Workflow**: Configured automated `.github/workflows/ci.yml` pipeline that triggers on `push` and `pull_request` to run `cargo test` on contracts and `npm run build` on the frontend.
-
-
+*Built for the Stellar Soroban Dojo — Level 4 Green Belt Submission*

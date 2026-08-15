@@ -2,33 +2,40 @@ import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { CreateBounty } from './components/CreateBounty';
 import { ExploreVaults } from './components/ExploreVaults';
+import { MilestoneManager } from './components/MilestoneManager';
 import { ActivityFeed } from './components/ActivityFeed';
 import { WalletProvider } from './WalletContext';
-import { INITIAL_BOUNTIES } from './utils';
-import type { BountyBox } from './types';
-import { Lock, Compass, ShieldCheck, Cpu } from 'lucide-react';
+import { INITIAL_BOUNTIES, INITIAL_MILESTONES, VAULTPAY_ESCROW_ID } from './utils';
+import type { BountyBox, MilestoneEscrow } from './types';
+import { Lock, Compass, ShieldCheck, Cpu, Layers } from 'lucide-react';
 
 export function AppContent() {
-  const [activeTab, setActiveTab] = useState<'create' | 'explore'>('explore');
+  const [activeTab, setActiveTab] = useState<'milestones' | 'explore' | 'create'>('milestones');
+
   const [bounties, setBounties] = useState<BountyBox[]>(() => {
     const saved = localStorage.getItem('timecap_bounties');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= INITIAL_BOUNTIES.length) {
-          return parsed;
-        }
-      } catch (e) {
-        console.error('Failed to parse saved bounties from localStorage:', e);
-      }
+        if (Array.isArray(parsed) && parsed.length >= INITIAL_BOUNTIES.length) return parsed;
+      } catch { /* use initial */ }
     }
     return INITIAL_BOUNTIES;
   });
 
-  // Sync bounties to localStorage on change
-  useEffect(() => {
-    localStorage.setItem('timecap_bounties', JSON.stringify(bounties));
-  }, [bounties]);
+  const [milestones, setMilestones] = useState<MilestoneEscrow[]>(() => {
+    const saved = localStorage.getItem('timecap_milestones');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      } catch { /* use initial */ }
+    }
+    return INITIAL_MILESTONES;
+  });
+
+  useEffect(() => { localStorage.setItem('timecap_bounties', JSON.stringify(bounties)); }, [bounties]);
+  useEffect(() => { localStorage.setItem('timecap_milestones', JSON.stringify(milestones)); }, [milestones]);
 
   const handleBountyCreated = (newBounty: BountyBox) => {
     setBounties((prev) => [newBounty, ...prev]);
@@ -38,94 +45,92 @@ export function AppContent() {
   const handleClaimSuccess = (bountyId: string, solverAddress: string) => {
     setBounties((prev) =>
       prev.map((b) =>
-        b.id === bountyId
-          ? {
-              ...b,
-              claimed: true,
-              claimedBy: `${solverAddress.slice(0, 4)}...${solverAddress.slice(-4)}`,
-            }
-          : b
+        b.id === bountyId ? { ...b, claimed: true, claimedBy: `${solverAddress.slice(0, 4)}…${solverAddress.slice(-4)}` } : b
       )
     );
   };
 
+  const handleAddMilestone = (m: MilestoneEscrow) => setMilestones((prev) => [m, ...prev]);
+  const handleUpdateMilestone = (updated: MilestoneEscrow) => setMilestones((prev) => prev.map((m) => m.id === updated.id ? updated : m));
+
+  const activeBounties = bounties.filter((b) => !b.claimed).length;
+  const activeEscrows = milestones.filter((m) => m.status !== 'released').length;
+
   return (
-    <div className="min-h-screen bg-[#F9F6F0] text-stone-900 flex flex-col font-sans selection:bg-rose-900 selection:text-stone-50">
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-[#FBF8F3] text-stone-900 flex flex-col font-sans selection:bg-[#8B0000] selection:text-stone-50">
       <Navbar />
 
-      {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        {/* Banner Hero */}
-        <div className="relative rounded-3xl overflow-hidden mb-8 border border-stone-200/80 bg-white p-8 md:p-10 shadow-sm">
+        {/* ─── Hero Banner ─── */}
+        <div className="relative rounded-2xl overflow-hidden mb-8 border border-[#E5DCCB] bg-[#FFFDF9] p-7 md:p-9 shadow-sm vp-animate-in">
           <div className="max-w-2xl relative z-10">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-900/10 border border-rose-900/20 text-rose-900 text-xs font-mono font-medium mb-4">
-              <Cpu className="w-3.5 h-3.5" /> Powered by Soroban Smart Contracts
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8B0000]/6 border border-[#8B0000]/15 text-[#8B0000] text-[0.68rem] font-mono font-medium mb-4">
+              <Cpu className="w-3 h-3" /> Soroban Smart Contracts · Level 4 Milestone Escrow
             </span>
-            <h1 className="text-3xl md:text-5xl font-serif font-normal tracking-tight text-rose-950 mb-4 leading-tight">
-              Cryptographic <span className="text-rose-900 italic">Time-Capsule</span> Bounty Box
+            <h1 className="font-playfair text-3xl md:text-[2.75rem] font-medium tracking-tight text-[#8B0000] mb-3 leading-[1.15]">
+              VaultPay <span className="italic font-normal text-[#991B1B]">Milestone&nbsp;Escrow</span>
             </h1>
-            <p className="text-stone-600 text-base md:text-lg mb-6 leading-relaxed font-light">
-              Create password-protected vaults with XLM bounties or solve cryptographic riddles on the Stellar Testnet. Verified on-chain with contract events & pure Freighter wallet.
+            <p className="text-stone-500 text-base md:text-[1.05rem] mb-5 leading-relaxed">
+              Trustless multi-sig milestone funding for sponsors and builders on Stellar Testnet.
+              Create escrow vaults, submit deliverables, and release payouts — all verified on-chain.
             </p>
 
-            {/* Quick stats */}
-            <div className="flex flex-wrap items-center gap-6 pt-4 border-t border-stone-100 text-xs font-mono text-stone-600">
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-4 h-4 text-rose-900" />
-                <span>Local SHA-256 Pre-Hashing</span>
+            <div className="flex flex-wrap items-center gap-5 pt-4 border-t border-[#E5DCCB] text-[0.68rem] font-mono text-stone-500">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#8B0000]" />
+                <span>Multi-Sig Auth</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Lock className="w-4 h-4 text-amber-700" />
-                <span>{bounties.filter((b) => !b.claimed).length} Active Vaults Available</span>
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-[#8B0000]" />
+                <span>{activeEscrows} Active Escrow{activeEscrows !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-amber-700" />
+                <span>{activeBounties} Riddle Vault{activeBounties !== 1 ? 's' : ''}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Real-Time Event Listening Activity Feed */}
+        {/* ─── Activity Feed ─── */}
         <ActivityFeed />
 
-        {/* Tab Navigation */}
+        {/* ─── Tab Navigation ─── */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1.5 rounded-2xl bg-white border border-stone-200 shadow-sm">
-            <button
-              onClick={() => setActiveTab('explore')}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium text-sm transition-opacity duration-300 cursor-pointer ${
-                activeTab === 'explore'
-                  ? 'bg-rose-900 text-stone-50 shadow-sm'
-                  : 'text-stone-600 hover:text-rose-900 hover:bg-stone-50'
-              }`}
-            >
-              <Compass className="w-4 h-4" />
-              <span>Explore & Crack Vaults</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('create')}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium text-sm transition-opacity duration-300 cursor-pointer ${
-                activeTab === 'create'
-                  ? 'bg-rose-900 text-stone-50 shadow-sm'
-                  : 'text-stone-600 hover:text-rose-900 hover:bg-stone-50'
-              }`}
-            >
-              <Lock className="w-4 h-4" />
-              <span>Create a Bounty Box</span>
-            </button>
+          <div className="inline-flex p-1 rounded-2xl bg-[#FFFDF9] border border-[#E5DCCB] shadow-sm">
+            {([
+              { id: 'milestones' as const, icon: Layers, label: 'Milestone Escrow' },
+              { id: 'explore' as const, icon: Compass, label: 'Riddle Vaults' },
+              { id: 'create' as const, icon: Lock, label: 'Create Vault' },
+            ]).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-medium text-[0.8rem] transition-all cursor-pointer ${
+                  activeTab === tab.id
+                    ? 'bg-[#8B0000] text-[#FBF8F3] shadow-sm'
+                    : 'text-stone-500 hover:text-[#8B0000] hover:bg-[#8B0000]/[0.03]'
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Tab Content */}
-        {activeTab === 'create' ? (
+        {/* ─── Tab Content ─── */}
+        {activeTab === 'milestones' ? (
+          <MilestoneManager milestones={milestones} onAddMilestone={handleAddMilestone} onUpdateMilestone={handleUpdateMilestone} />
+        ) : activeTab === 'create' ? (
           <CreateBounty onBountyCreated={handleBountyCreated} />
         ) : (
           <ExploreVaults bounties={bounties} onClaimSuccess={handleClaimSuccess} />
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-stone-200/80 py-6 px-6 text-center text-xs text-stone-500 font-mono">
-        <p>Time-Capsule Bounty Box dApp • Built for Stellar Testnet Soroban • Verified On-Chain Transactions</p>
+      <footer className="border-t border-[#E5DCCB] py-5 px-6 text-center text-[0.68rem] text-stone-400 font-mono">
+        <p>VaultPay · Level 4 Milestone Escrow on Stellar Soroban · Contract {VAULTPAY_ESCROW_ID.slice(0, 8)}…{VAULTPAY_ESCROW_ID.slice(-4)}</p>
       </footer>
     </div>
   );
