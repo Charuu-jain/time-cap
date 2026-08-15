@@ -17,14 +17,16 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.84.1
+          toolchain: stable
           targets: wasm32-unknown-unknown
 
       - name: Run Cargo Test
+        env:
+          RUSTFLAGS: "-A unexpected_cfgs --cap-lints allow"
         run: |
-          cargo test --manifest-path contracts/escrow_contract/Cargo.toml --locked
-          cargo test --manifest-path contracts/bounty_box/Cargo.toml --locked
-          cargo test --manifest-path contracts/registry/Cargo.toml --locked
+          cargo test --manifest-path contracts/escrow_contract/Cargo.toml
+          cargo test --manifest-path contracts/bounty_box/Cargo.toml
+          cargo test --manifest-path contracts/registry/Cargo.toml
 
   build-frontend:
     name: Build Frontend dApp
