@@ -1,6 +1,7 @@
+*Makefile linguist-detectable=false
+*makefile linguist-detectable=false
+*.mk linguist-detectable=false
 Makefile linguist-vendored
 *.mk linguist-vendored
-Makefile linguist-detectable=false
-contracts/target/** linguist-vendored
-frontend/.next/** linguist-vendored
-frontend/dist/** linguist-vendored
+frontend/** linguist-detectable=true
+contracts/** linguist-detectable=true

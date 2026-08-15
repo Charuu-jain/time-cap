@@ -151,3 +151,4 @@ export function App() {
 }
 
 export default App;
+// Trigger GitHub Linguist language re-indexing
