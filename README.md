@@ -23,25 +23,47 @@ VaultPay empowers sponsors and builders to establish trustless, milestone-based 
 
 ## 🏛️ System Architecture
 
-VaultPay connects a responsive React/Vite client to the Stellar Testnet through Freighter wallet signatures and custom Soroban contracts.
+VaultPay connects a responsive React/Vite client to the Stellar Testnet through Freighter wallet signatures and custom Soroban smart contracts.
 
+```mermaid
+graph TD
+    classDef client fill:#FFF8F0,stroke:#8B0000,stroke-width:2px,color:#4A0404;
+    classDef rpc fill:#FAF5EE,stroke:#D97706,stroke-width:2px,color:#78350F;
+    classDef contract fill:#FFFDF9,stroke:#059669,stroke-width:2px,color:#064E3B;
+    classDef ledger fill:#F4ECE1,stroke:#4B5563,stroke-width:2px,color:#111827;
+
+    User["👤 User & Freighter Wallet"]:::client
+    Client["💻 React + Vite Client (Red-Beige UI)"]:::client
+    RPC["⚡ Soroban RPC Node (Testnet)"]:::rpc
+    Ledger[("🌐 Stellar Testnet Ledger")]:::ledger
+
+    subgraph Soroban_Smart_Contracts ["🏛️ Soroban Smart Contracts"]
+        Escrow["🔒 Level 4 Milestone Escrow (CCK7...3MCX)<br/>• initialize_vault<br/>• fund_vault<br/>• submit_work<br/>• approve_and_release<br/>• refund"]:::contract
+        Bounty["🎁 Level 3 Riddle Vault (CDYI...4YHYU)<br/>• create_bounty<br/>• claim_bounty"]:::contract
+        Registry["📜 Cross-Contract Registry (CC4K...IIYA)<br/>• log_bounty"]:::contract
+    end
+
+    User -->|"1. Connect & Sign XDR"| Client
+    Client -->|"2. Simulate & Prepare Tx"| RPC
+    RPC -->|"3. Broadcast Signed Tx"| Ledger
+    Ledger -->|"4. Execute Host Functions"| Escrow
+    Ledger -->|"4. Execute Host Functions"| Bounty
+    Bounty -->|"Cross-Contract Call"| Registry
+    Ledger -.->|"5. Ingestion Polling (status: SUCCESS)"| Client
 ```
-[ User / Freighter Wallet ]
-│
-▼
-[ React + Vite Client (Red-Beige Theme) ]
-│  (Simulate & Sign XDR)
-▼
-[ Soroban RPC Endpoint ] ──► [ Stellar Testnet Ledger ]
-│
-┌─────────────────────────┴─────────────────────────┐
-▼                                                   ▼
-[ Milestone Escrow Contract ]                         [ Bounty Box Riddle ]
-* initialize_vault                                    * create_bounty
-* fund_vault                                          * claim_bounty
-* submit_work
-* approve_and_release
-* refund
+
+### Milestone Escrow Lifecycle State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Created: initialize_vault() [Sponsor Auth]
+    Created --> Funded: fund_vault() [Transfer XLM to Escrow]
+    Funded --> Submitted: submit_work() [Builder Auth + Proof URI]
+    Funded --> Refunded: refund() [Sponsor Auth Reclaim]
+    Submitted --> Released: approve_and_release() [Sponsor Multi-Sig Approval]
+    Submitted --> Refunded: refund() [Sponsor Reclaim]
+    Released --> [*]: Payout Transferred to Builder
+    Refunded --> [*]: Tokens Returned to Sponsor
 ```
 
 ### Flow Breakdown
