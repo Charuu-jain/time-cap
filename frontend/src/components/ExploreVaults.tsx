@@ -59,7 +59,8 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       setStatusMsg({ type: 'error', text: 'Please connect your Stellar wallet to claim bounties!' });
       return;
     }
-    if (!guess.trim()) {
+    const cleanGuess = guess.trim();
+    if (!cleanGuess) {
       setStatusMsg({ type: 'error', text: 'Please enter a solution guess.' });
       return;
     }
@@ -69,15 +70,23 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
     setStatusMsg({ type: 'info', text: 'Verifying solution and preparing claim_bounty transaction...' });
 
     try {
-      const computedHash = await hashSecret(guess.trim());
+      const computedHash = await hashSecret(cleanGuess);
+      const targetHash = selectedBounty.secretHash.trim().toLowerCase();
 
-      if (computedHash.toLowerCase() !== selectedBounty.secretHash.toLowerCase()) {
+      // Check exact match, uppercase match, or lowercase match
+      const isMatch =
+        computedHash === targetHash ||
+        (await hashSecret(cleanGuess.toUpperCase())) === targetHash ||
+        (await hashSecret(cleanGuess.toLowerCase())) === targetHash ||
+        (selectedBounty.solution && cleanGuess.toLowerCase() === selectedBounty.solution.trim().toLowerCase());
+
+      if (!isMatch) {
         throw new Error('Incorrect solution! The cryptographic hash does not match.');
       }
 
       const res = await submitClaimBounty({
         solverAddress: walletAddress,
-        solutionStr: guess.trim(),
+        solutionStr: cleanGuess,
         signTransactionFn: signTx,
         onStatusUpdate: (stepText) => {
           setPendingStep(stepText);

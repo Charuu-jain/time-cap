@@ -5,7 +5,6 @@ export const REGISTRY_ID = 'CC4KVRNPU33PKYHDHO6T2YYID2D6O2RRKUBCWSH4CLYUZ6ZFEZLF
 export const XLM_TOKEN_ID = 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC';
 export const VAULTPAY_ESCROW_ID = 'CCK7CXFEAQIFWLBBOVMGBQD2BHYDJJRUN2Z7VZFZE5OEU6FS5BGX3MCX';
 
-
 export const INITIAL_BOUNTIES: BountyBox[] = [
   {
     id: 'bounty-1',
@@ -16,7 +15,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GBX4...9KL2',
     amount: '250',
     claimed: false,
-    secretHash: '3ab1ed3802e3b2e597148bf5b722bb7648ce2a6cfca069ef84a7e937d57a9159',
+    secretHash: '157f204af59ba51587f26db9b023f1f4f28b42a43044207f21e29ad441b547f6',
     createdAt: Date.now() - 3600000 * 12,
   },
   {
@@ -28,7 +27,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GA7P...3MN1',
     amount: '100',
     claimed: false,
-    secretHash: '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', // SHA256 of "2014"
+    secretHash: '96da37e95d5cc34fe3bef6c89428df859b8a217630d0c664da1daf1539caacf5',
     createdAt: Date.now() - 3600000 * 24,
   },
   {
@@ -40,7 +39,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GDF9...8QQ4',
     amount: '500',
     claimed: false,
-    secretHash: '6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b', // SHA256 of "rust"
+    secretHash: '521fe5c9ece1aa1f8b66228171598263574aefc6fa4ba06a61747ec81ee9f5a3',
     createdAt: Date.now() - 3600000 * 48,
   },
   {
@@ -52,7 +51,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GBK9...1AA4',
     amount: '150',
     claimed: false,
-    secretHash: '0a80e15647573f08b3400a40660ea9b4a451152a514d0263f350c33a92eeefb2', // SHA256 of "XLM"
+    secretHash: '4e3c27636ee9bcbead5577c49a291fb1ec9a07e9885a7a2f55402da81c3d369a',
     createdAt: Date.now() - 3600000 * 5,
   },
   {
@@ -64,7 +63,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GCM3...7KK8',
     amount: '300',
     claimed: false,
-    secretHash: 'e6371cf7fd748a071ed77085ef1295286ce17bbd22223a54d588523b1c67caaa', // SHA256 of "wasm32-unknown-unknown"
+    secretHash: 'f29e9283c25ab5a7f60256bdc2ea046e086b37b0fad0fc6220562db264c47f49',
     createdAt: Date.now() - 3600000 * 8,
   },
   {
@@ -76,7 +75,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GD77...2MM9',
     amount: '200',
     claimed: false,
-    secretHash: 'cc29b16584bf72d17482811a2f643e2e0edcfb677a2ee344d9f6ce4fa65239a5', // SHA256 of "SCP"
+    secretHash: 'cad9f5f77b5b09f04cc6cd572e5e5f3dc41f981e08912925231f9a71720761a0',
     createdAt: Date.now() - 3600000 * 16,
   },
   {
@@ -88,7 +87,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GBZ2...4VV1',
     amount: '120',
     claimed: false,
-    secretHash: '532ea6710124d4009670a50e035ed896c0245a36435c437a2417e9d592658d8e', // SHA256 of "Test"
+    secretHash: '532eaabd9574880dbf76b9b8cc00832c20a6ec113d682299550d7a6e0f345e25',
     createdAt: Date.now() - 3600000 * 2,
   },
   {
@@ -100,7 +99,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GAP8...6QQ3',
     amount: '180',
     claimed: false,
-    secretHash: '35ec8a635832a84e311db6cb766324bfa76722d363f82f256ea455a297e6be9a', // SHA256 of "jed"
+    secretHash: '53accc333dc04657e052bb978473ba20ec1162b8ba1b96b21fc7edc30fa3c3b3',
     createdAt: Date.now() - 3600000 * 20,
   },
   {
@@ -112,7 +111,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GBH5...9LL0',
     amount: '350',
     claimed: false,
-    secretHash: '7394eb18d6e32bc0cbb105e1a12ea354c4a450c6066ce6c8d32b509efef8dce2', // SHA256 of "Freighter"
+    secretHash: '9025eb8de6f4a104358b96999364e5444dd3aa635eae237680874da89013a4bb',
     createdAt: Date.now() - 3600000 * 3,
   },
   {
@@ -124,7 +123,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GDK1...5WW7',
     amount: '400',
     claimed: false,
-    secretHash: '115e45a0b73c4f74d0891d4e414c2b9a7b9736c05d7616b4fb6c17e0e84c98f9', // SHA256 of "persistent"
+    secretHash: '75b07bb3ffb3b8ad63e79b983fbef8fd0ee8e7292144b4e7d3b57bd682074087',
     createdAt: Date.now() - 3600000 * 1,
   },
   {
@@ -136,7 +135,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GCB3...8ZZ2',
     amount: '220',
     claimed: false,
-    secretHash: '5d5b09f6dcb2d53a5fffc60c4ac0d55fad1551e07c938072049d5ef222f77e68', // SHA256 of "sha256"
+    secretHash: '5d5b09f6dcb2d53a5fffc60c4ac0d55fabdf556069d6631545f42aa6e3500f2e',
     createdAt: Date.now() - 3600000 * 7,
   },
   {
@@ -148,7 +147,7 @@ export const INITIAL_BOUNTIES: BountyBox[] = [
     creator: 'GA99...1BB5',
     amount: '280',
     claimed: false,
-    secretHash: '7021eb199b50db084803923efcf9ffea5561a35ae4f3f1e967fa71c1103f1ebf', // SHA256 of "SAC"
+    secretHash: '9b17a298fa5efe8cb6f71337730e527613b422d4ee0d6f091acbe0e2d9fe7745',
     createdAt: Date.now() - 3600000 * 14,
   }
 ];
@@ -201,13 +200,16 @@ export const INITIAL_MILESTONES: MilestoneEscrow[] = [
   }
 ];
 
-export async function hashSecret(secret: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(secret);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+export async function sha256Hex(str: string): Promise<string> {
+  const utf8 = new TextEncoder().encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+  return Array.from(new Uint8Array(hashBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toLowerCase();
 }
+
+export const hashSecret = sha256Hex;
 
 export function generateTxHash(): string {
   const chars = 'abcdef0123456789';

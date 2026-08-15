@@ -13,29 +13,35 @@ export function AppContent() {
   const [activeTab, setActiveTab] = useState<'milestones' | 'explore' | 'create'>('milestones');
 
   const [bounties, setBounties] = useState<BountyBox[]>(() => {
-    const saved = localStorage.getItem('timecap_bounties');
+    const saved = localStorage.getItem('timecap_bounties_v4');
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= INITIAL_BOUNTIES.length) return parsed;
+        const parsed: BountyBox[] = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Merge with INITIAL_BOUNTIES to ensure latest accurate hashes on seed items
+          return INITIAL_BOUNTIES.map((init) => {
+            const existing = parsed.find((p) => p.id === init.id);
+            return existing ? { ...init, claimed: existing.claimed, claimedBy: existing.claimedBy } : init;
+          }).concat(parsed.filter((p) => !INITIAL_BOUNTIES.some((init) => init.id === p.id)));
+        }
       } catch { /* use initial */ }
     }
     return INITIAL_BOUNTIES;
   });
 
   const [milestones, setMilestones] = useState<MilestoneEscrow[]>(() => {
-    const saved = localStorage.getItem('timecap_milestones');
+    const saved = localStorage.getItem('timecap_milestones_v4');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       } catch { /* use initial */ }
     }
     return INITIAL_MILESTONES;
   });
 
-  useEffect(() => { localStorage.setItem('timecap_bounties', JSON.stringify(bounties)); }, [bounties]);
-  useEffect(() => { localStorage.setItem('timecap_milestones', JSON.stringify(milestones)); }, [milestones]);
+  useEffect(() => { localStorage.setItem('timecap_bounties_v4', JSON.stringify(bounties)); }, [bounties]);
+  useEffect(() => { localStorage.setItem('timecap_milestones_v4', JSON.stringify(milestones)); }, [milestones]);
 
   const handleBountyCreated = (newBounty: BountyBox) => {
     setBounties((prev) => [newBounty, ...prev]);
