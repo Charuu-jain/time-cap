@@ -2,13 +2,22 @@
 
 > Trustless multi-sig milestone funding & payout protocol on Stellar Testnet powered by Soroban smart contracts, Freighter wallet authentication, and real-time on-chain transaction lifecycle management.
 
-![VaultPay UI](ui_1.jpeg)
+![VaultPay UI](desktop_ui.png)
+
+---
+
+## 🔗 Quick Links & Live Deployments
+
+- **🌐 Live Production dApp:** [https://time-cap-pink.vercel.app](https://time-cap-pink.vercel.app)
+- **📹 Video Walkthrough Demo:** [Watch on YouTube](https://youtu.be/kU-9rY_xXgI)
+- **📊 10-Step Testnet Transaction Matrix:** [FEEDBACK_SUMMARY.md](FEEDBACK_SUMMARY.md)
+- **📦 GitHub Repository:** [https://github.com/Charuu-jain/time-cap](https://github.com/Charuu-jain/time-cap)
 
 ---
 
 ## 🏛️ Architecture & System Design
 
-VaultPay extends the Time-Cap decentralized vault architecture into a production-grade **Milestone Escrow protocol (Level 4 Green Belt)**.
+VaultPay extends the decentralized vault architecture into a production-grade **Milestone Escrow protocol (Level 4 Green Belt)**.
 
 ```
                   ┌─────────────────────────────────────────────────────────┐
@@ -120,7 +129,7 @@ cargo test --manifest-path contracts/escrow_contract/Cargo.toml # 9 tests ok
 ## 💻 Frontend & Freighter Wallet Integration
 
 - **Framework**: Vite 8 + React 19 + TypeScript + TailwindCSS
-- **Design Aesthetic**: Warm beige background (`#FBF8F3`), crimson brand accents (`#8B0000`), Playfair Display serif typography, and glass-card components.
+- **Design Aesthetic**: Warm beige background (`#FBF8F3`), crimson brand accents (`#8B0000`), Playfair Display serif typography, and custom glass cards.
 - **Wallet Support**: Freighter Browser Extension with automatic testnet balance fetching from Horizon.
 - **RPC Integration**: Real `@stellar/stellar-sdk` Soroban RPC client simulation, XDR generation, Freighter pop-up signing, and transaction polling with live StellarExpert links.
 
@@ -171,11 +180,15 @@ npm run build
 
 ---
 
-## 📸 Interface Preview
+## 📸 Screenshots Gallery
 
-| Multi-Wallet & Escrow | Milestone Dashboard | Mobile View |
-| :---: | :---: | :---: |
-| ![Wallet](walletconnect.png) | ![UI](ui_1.jpeg) | ![Mobile](newmobile.jpeg) |
+| Desktop UI | Mobile Viewport |
+| :---: | :---: |
+| ![Desktop UI](desktop_ui.png) | ![Mobile View](mobile_ui.jpeg) |
+
+| CI/CD Pipeline (Passing) | StellarExpert Contract & WASM Instance |
+| :---: | :---: |
+| ![CI/CD Pipeline](ci_cd.png) | ![StellarExpert WASM](WASM.png) |
 
 ---
 
