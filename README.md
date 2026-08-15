@@ -1,14 +1,14 @@
-# VaultPay 🔐
+# Time-Cap ⏳ (Level 4: Milestone Escrow & Vault Architecture)
 
-VaultPay is a production-grade, Level 4 Stellar Soroban multi-sig escrow decentralized application (dApp). It enables secure milestone payments between project sponsors and builders.
+Time-Cap is a production-grade, Level 4 Stellar Soroban multi-sig escrow decentralized application (dApp). It enables secure milestone payments and time-locked vaults between project sponsors and builders.
 
 ## 🚀 Live Links
 - **Live Demo Video Link:** `[Add Video Link Here]`
-- **Vercel Deployment URL:** `[Add Vercel URL Here]`
+- **Production Deployment URL:** [https://time-cap-pink.vercel.app](https://time-cap-pink.vercel.app)
 
 ## ⛓️ Network & Contract
 - **Network:** Stellar Testnet
-- **Contract ID:** `CBMPYTIDNBJSFO77QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY`
+- **Live Contract ID:** `CBMPYTIDNBJSF077QBHZMBFJPBT3TRL4XBS5KLMIMZGBS33BX6YUVMDY`
 
 ## 🏗️ Architecture Overview
 
@@ -26,7 +26,7 @@ The system consists of two main components:
 ### Running the Contracts
 1. Navigate to the contract directory: `cd contracts/escrow_contract`
 2. Run tests: `cargo test`
-3. Build WASM: `stellar contract build`
+3. Build WASM: `cargo build --target wasm32-unknown-unknown --release`
 4. To test with automated mock escrows: `./contracts/scripts/seed_test_escrows.sh`
 
 ### Running the Frontend
@@ -38,3 +38,7 @@ The system consists of two main components:
 ## 📈 Analytics & Monitoring
 The application utilizes PostHog for crash analytics and user transaction funnel monitoring, alongside Vercel Analytics for production page view tracking. An ErrorBoundary catches unforeseen wallet exception crashes to maintain a smooth user experience.
 
+---
+
+## ⏳ Level 3: Time-Capsule Bounty Box (Legacy)
+The previous iteration of this repository housed the **Time-Capsule Bounty Box**, a Level 3 milestone project. All historical documentation, specifications, and deployed contract proof for that project have been safely preserved in git history and integrated into this expanded architecture.

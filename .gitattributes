@@ -1,0 +1,4 @@
+Makefile linguist-vendored
+*.mk linguist-vendored
+contracts/target/** linguist-vendored
+frontend/.next/** linguist-vendored
