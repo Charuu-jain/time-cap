@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -20,31 +20,11 @@ jobs:
           toolchain: 1.84.1
           targets: wasm32-unknown-unknown
 
-      - name: Cache Cargo Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            contracts/bounty_box/target
-            contracts/escrow_contract/target
-            contracts/registry/target
-          key: ${{ runner.os }}-cargo-1.84.1-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-1.84.1-
-
-      - name: Install Stellar CLI
-        run: |
-          cargo install --locked stellar-cli --features opt || true
-
       - name: Run Cargo Test
         run: |
-          for dir in contracts/escrow_contract contracts/bounty_box contracts/registry; do
-            if [ -d "$dir" ]; then
-              cargo update --manifest-path $dir/Cargo.toml -p zeroize_derive --precise 1.4.2 || true
-              cargo test --manifest-path $dir/Cargo.toml
-            fi
-          done
+          cargo test --manifest-path contracts/escrow_contract/Cargo.toml --locked
+          cargo test --manifest-path contracts/bounty_box/Cargo.toml --locked
+          cargo test --manifest-path contracts/registry/Cargo.toml --locked
 
   build-frontend:
     name: Build Frontend dApp

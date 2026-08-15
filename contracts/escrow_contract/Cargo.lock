@@ -1726,8 +1726,3 @@ dependencies = [
  "quote",
  "syn 2.0.119",
 ]
-
-[[patch.unused]]
-name = "zeroize_derive"
-version = "1.4.2"
-source = "git+https://github.com/RustCrypto/utils?tag=zeroize_derive-v1.4.2#83c7093d6068700c3f2a60b4b7e581b6da508008"
