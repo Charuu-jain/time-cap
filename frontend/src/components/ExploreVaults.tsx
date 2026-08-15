@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, Unlock, CheckCircle2, AlertTriangle, Key, Search, Sparkles, Coins, ExternalLink, Inbox, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { BountyBox } from '../types';
-import { hashSecret, generateTxHash } from '../utils';
+import { hashSecret } from '../utils';
 import { submitClaimBounty } from '../soroban';
 import { useWallet } from '../WalletContext';
 
@@ -84,24 +84,16 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
         throw new Error('Incorrect solution! The cryptographic hash does not match.');
       }
 
-      let txHash = '';
-      try {
-        const res = await submitClaimBounty({
-          solverAddress: walletAddress,
-          solutionStr: cleanGuess,
-          signTransactionFn: signTx,
-          onStatusUpdate: (stepText) => {
-            setPendingStep(stepText);
-            setStatusMsg({ type: 'info', text: stepText });
-          },
-        });
-        txHash = res.txHash;
-      } catch (onChainErr: any) {
-        console.warn('On-chain claim_bounty notice for demo vault:', onChainErr);
-        // If simulation failed because the demo seed riddle was not funded on-chain in this specific contract instance,
-        // create a genuine local claim verification hash and unlock the reward cleanly for the solver.
-        txHash = generateTxHash();
-      }
+      const res = await submitClaimBounty({
+        solverAddress: walletAddress,
+        solutionStr: cleanGuess,
+        signTransactionFn: signTx,
+        onStatusUpdate: (stepText) => {
+          setPendingStep(stepText);
+          setStatusMsg({ type: 'info', text: stepText });
+        },
+      });
+      const txHash = res.txHash;
 
       onClaimSuccess(selectedBounty.id, walletAddress);
       await refreshBalance();

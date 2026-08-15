@@ -210,12 +210,3 @@ export async function sha256Hex(str: string): Promise<string> {
 }
 
 export const hashSecret = sha256Hex;
-
-export function generateTxHash(): string {
-  const chars = 'abcdef0123456789';
-  let hash = '';
-  for (let i = 0; i < 64; i++) {
-    hash += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return hash;
-}
