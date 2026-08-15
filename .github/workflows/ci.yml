@@ -17,7 +17,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.82.0
+          toolchain: stable
           targets: wasm32-unknown-unknown
 
       - name: Cache Cargo Dependencies
@@ -29,19 +29,19 @@ jobs:
             contracts/bounty_box/target
             contracts/escrow_contract/target
             contracts/registry/target
-          key: ${{ runner.os }}-cargo-1.82-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
+          key: ${{ runner.os }}-cargo-stable-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-1.82-
+            ${{ runner.os }}-cargo-stable-
 
       - name: Install Stellar CLI
         run: |
           cargo install --locked stellar-cli --features opt || true
 
-      - name: Update Dependencies
+      - name: Update problematic dependencies
         run: |
-          cargo update --manifest-path contracts/escrow_contract/Cargo.toml -p ethnum --precise 1.5.3 || true
-          cargo update --manifest-path contracts/bounty_box/Cargo.toml -p ethnum --precise 1.5.3 || true
-          cargo update --manifest-path contracts/registry/Cargo.toml -p ethnum --precise 1.5.3 || true
+          cargo update --manifest-path contracts/escrow_contract/Cargo.toml -p ethnum --precise 1.5.2 || cargo update --manifest-path contracts/escrow_contract/Cargo.toml -p ethnum || true
+          cargo update --manifest-path contracts/bounty_box/Cargo.toml -p ethnum --precise 1.5.2 || cargo update --manifest-path contracts/bounty_box/Cargo.toml -p ethnum || true
+          cargo update --manifest-path contracts/registry/Cargo.toml -p ethnum --precise 1.5.2 || cargo update --manifest-path contracts/registry/Cargo.toml -p ethnum || true
 
       - name: Run Cargo Test
         run: |
