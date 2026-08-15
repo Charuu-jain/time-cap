@@ -19,3 +19,6 @@ debug = 0
 strip = "debuginfo"
 codegen-units = 1
 lto = true
+
+[patch.crates-io]
+zeroize_derive = { git = "https://github.com/RustCrypto/utils", tag = "zeroize_derive-v1.4.2" }

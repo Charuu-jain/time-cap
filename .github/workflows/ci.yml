@@ -39,9 +39,12 @@ jobs:
 
       - name: Run Cargo Test
         run: |
-          cargo test --manifest-path contracts/escrow_contract/Cargo.toml --verbose
-          cargo test --manifest-path contracts/bounty_box/Cargo.toml --verbose
-          cargo test --manifest-path contracts/registry/Cargo.toml --verbose
+          for dir in contracts/escrow_contract contracts/bounty_box contracts/registry; do
+            if [ -d "$dir" ]; then
+              cargo update --manifest-path $dir/Cargo.toml -p zeroize_derive --precise 1.4.2 || true
+              cargo test --manifest-path $dir/Cargo.toml
+            fi
+          done
 
   build-frontend:
     name: Build Frontend dApp

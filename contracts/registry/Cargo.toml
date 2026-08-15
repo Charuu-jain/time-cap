@@ -8,7 +8,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-soroban-sdk = "22.0.0"
+soroban-sdk = "22.0.1"
 
 [profile.release]
 opt-level = "z"
@@ -22,3 +22,6 @@ codegen-units = 1
 [profile.release-with-logs]
 inherits = "release"
 debug-assertions = true
+
+[patch.crates-io]
+zeroize_derive = { git = "https://github.com/RustCrypto/utils", tag = "zeroize_derive-v1.4.2" }
