@@ -16,8 +16,8 @@ VaultPay empowers sponsors and builders to establish trustless, milestone-based 
 
 ## 📺 Project Demo Videos
 
-- **Level 4 (Green Belt MVP — Multi-Sig Escrow & Live Testnet Invocations):** [Watch Demo Video](https://www.loom.com/share/placeholder-level3)
-- **Level 3 (Cryptographic Riddle Vault Prototype):** [Watch Level 3 Prototype Video](https://www.loom.com/share/placeholder-level3)
+- **Level 4 (Green Belt MVP — Multi-Sig Escrow & Live Testnet Invocations):** [Watch Demo Video](https://drive.google.com/file/d/1EdSsFJP_vndZp4mBnFaOFu6BHXCKJ-vF/view?usp=drive_link)
+- **Level 3 (Cryptographic Riddle Vault Prototype):** [Watch Level 3 Prototype Video](https://drive.google.com/file/d/1EdSsFJP_vndZp4mBnFaOFu6BHXCKJ-vF/view?usp=drive_link)
 
 ---
 
