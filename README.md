@@ -128,6 +128,10 @@ test result: ok. 3 passed; 0 failed
 ### StellarExpert Contract Explorer
 ![WASM Contract](./assets/screenshots/wasm-contract.png)
 
+### 📊 Production Analytics & Monitoring
+![Vercel Analytics](./assets/screenshots/analytics.png)
+*(Real-time Web Analytics tracking visitor traffic, page latency, and user interaction events on Vercel deployment)*
+
 ---
 
 ## 🛠️ Local Development & Setup
