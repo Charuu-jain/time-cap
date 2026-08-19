@@ -65,6 +65,20 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       return;
     }
 
+    // Guard: creator cannot claim their own bounty — on-chain auth would reject the simulation
+    if (
+      selectedBounty.creator &&
+      selectedBounty.creator.length > 8 &&
+      !selectedBounty.creator.includes('...') &&
+      walletAddress === selectedBounty.creator
+    ) {
+      setStatusMsg({
+        type: 'error',
+        text: '⚠️ You are the creator of this bounty. Please switch to a different solver wallet in Freighter to claim.',
+      });
+      return;
+    }
+
     setLoading(true);
     setPendingStep('Verifying SHA-256 solution...');
     setStatusMsg({ type: 'info', text: 'Verifying solution and preparing claim_bounty transaction...' });
@@ -115,6 +129,7 @@ export const ExploreVaults: React.FC<ExploreVaultsProps> = ({
       setPendingStep('');
     }
   };
+
 
   const filteredBounties = bounties.filter(
     (b) =>

@@ -41,6 +41,15 @@ export function categorizeError(err: any): string {
   ) {
     return 'Transaction Error: Transaction signing was rejected by user in Freighter.';
   }
+  if (rawMsg.includes('Incorrect solution') || rawMsg.includes('WasmVm') || rawMsg.includes('Error(Contract, #3)')) {
+    return 'Wrong Answer: The solution you entered does not match the stored hash for any on-chain bounty vault.';
+  }
+  if (rawMsg.includes('AlreadyClaimed') || rawMsg.includes('Error(Contract, #2)')) {
+    return 'Already Claimed: This bounty vault has already been solved and claimed by another solver.';
+  }
+  if (rawMsg.includes('AlreadyInitialized') || rawMsg.includes('Error(Contract, #1)')) {
+    return 'Duplicate Bounty: A bounty with this secret hash already exists on-chain.';
+  }
   if (
     rawMsg.includes('UnreachableCodeReached') ||
     rawMsg.includes('InvalidAction') ||
@@ -51,6 +60,7 @@ export function categorizeError(err: any): string {
 
   return rawMsg;
 }
+
 
 /**
  * Polls for transaction completion using server.getTransaction(hash)
@@ -384,9 +394,21 @@ export async function submitClaimBounty({
   onStatusUpdate?: (status: string) => void;
 }): Promise<{ txHash: string }> {
   try {
+    const trimmedSolution = solutionStr.trim();
+    if (!trimmedSolution) throw new Error('Solution string cannot be empty.');
+
+    console.log('[submitClaimBounty] Invoking claim_bounty with parameters:', {
+      contractId: CONTRACT_ID,
+      solverAddress,
+      solutionStr: trimmedSolution,
+      solutionLength: trimmedSolution.length,
+    });
+
     const contract = new Contract(CONTRACT_ID);
+    // solver: Address ScVal
     const solverScVal = Address.fromString(solverAddress).toScVal();
-    const solutionScVal = nativeToScVal(solutionStr, { type: 'string' });
+    // solution_str: Soroban String ScVal — contract will sha256() this internally and look up the bounty key
+    const solutionScVal = nativeToScVal(trimmedSolution, { type: 'string' });
 
     const op = contract.call('claim_bounty', solverScVal, solutionScVal);
 
@@ -400,3 +422,4 @@ export async function submitClaimBounty({
     throw new Error(categorizeError(err));
   }
 }
+
