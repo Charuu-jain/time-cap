@@ -11,6 +11,7 @@ VaultPay empowers sponsors and builders to establish trustless, milestone-based 
 - **Live dApp URL:** [https://time-cap-pink.vercel.app/](https://time-cap-pink.vercel.app/)
 - **GitHub Repository:** [https://github.com/Charuu-jain/time-cap](https://github.com/Charuu-jain/time-cap)
 - **User Feedback & Validation Matrix:** [FEEDBACK_SUMMARY.md](./FEEDBACK_SUMMARY.md)
+- **UX Feedback & Heuristic Analysis:** [UX_FEEDBACK_ANALYSIS.md](./UX_FEEDBACK_ANALYSIS.md)
 
 ---
 
