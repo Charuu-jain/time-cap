@@ -168,4 +168,25 @@ npm run dev
 
 ---
 
+## 👥 User Onboarding & Testnet Transaction Proofs
+
+10 unique testnet wallets were generated and funded via Friendbot, each performing a live on-chain SAC token transfer interaction with the deployed Escrow contract. All transaction hashes are independently verifiable on StellarExpert.
+
+| # | Wallet Address | Transaction Hash | Asset | Status |
+| :- | :--- | :--- | :--- | :--- |
+| 1 | `GAHD3VEXNQALT65S3OQT37LNAUIEI3T2H7BD7K4WNWGTKP7WTBE2HZPO` | [`0ae031c2...6257`](https://stellar.expert/explorer/testnet/tx/0ae031c2e245d3bd0478bc86d3aa373db3c14c8244de12138c9a1ab246646257) | XLM | ✅ |
+| 2 | `GDNKDVWSLEDXTAUFGZERRPE6G5MMVSPHCT37QSYMG6XMI3EWFEGDWQZS` | [`509d0171...5c2`](https://stellar.expert/explorer/testnet/tx/509d01717b2fecb086b6e9bc2696b9d1b43dc8f14a944ba91a5b8aeef34bc5c2) | XLM | ✅ |
+| 3 | `GBGJKKZ5NU52IRT6SH5VFGEKBLVYMHZSITFRA4XMX3OFILRBCMYPKTHJ` | [`faddcc55...d89`](https://stellar.expert/explorer/testnet/tx/faddcc5533eee735c325da9a719e57b4da359836ac3576e0b22f05b471206d89) | XLM | ✅ |
+| 4 | `GACOBBMOXF5F65W276VT3QFHDDK6JHFKMO5UCXUTTKVSENG55ZLOUIOE` | [`4ec9a484...017`](https://stellar.expert/explorer/testnet/tx/4ec9a484b3a740f0ce86cedcbde64c8105e88fd6f4a0afbd8b2848787b78f017) | XLM | ✅ |
+| 5 | `GBXBCLHHHDR56PDOOD7SDKRE5AFELLQ3FIVZT3D7YMIR4EEEUSV3AVIP` | [`e6ab37b2...b44`](https://stellar.expert/explorer/testnet/tx/e6ab37b26876ded09dd8591db98c44702f6ca7064f8c9655d74b89f398d69b44) | XLM | ✅ |
+| 6 | `GDFZ3MVU6E66J7REOBLLB6RPOEZIFQ47FLPCK3HRY4CZERMET53T5RCP` | [`0c931d0b...84e`](https://stellar.expert/explorer/testnet/tx/0c931d0be222019d24272a3c533436e2f4a0a0c08625d126506892d04bf7684e) | XLM | ✅ |
+| 7 | `GDIKE5OMBLAQD7TQ7KUMATEXCO5DWMBPAXHCUVEDJUO2JY7IUEIYSF2O` | [`ccc5d178...961`](https://stellar.expert/explorer/testnet/tx/ccc5d1782b7a0f031053e81bb3bfcd7859317b637ca6f0bf06aea940c3018961) | XLM | ✅ |
+| 8 | `GDVCZJCSSVTC4HEJWGKWXP2GOADD32I3HNGKVTRJ2QFBQI6Z7T6V5T4H` | [`9aaddffc...30d`](https://stellar.expert/explorer/testnet/tx/9aaddffc09ed6e1d84025fc23d878d3fa3d31b6d83eac594f7f2b9719a92320d) | XLM | ✅ |
+| 9 | `GBUO2VYMVB3Y3RHIOVGNHISX6UEC7CSMUPN2QQ6PS3M5LGOITAH7FQCQ` | [`1e87ab4c...8a8`](https://stellar.expert/explorer/testnet/tx/1e87ab4cc74a331266e2935d994a4fa81e6ddf9c0902a254a11ff17cbe84d8a8) | XLM | ✅ |
+| 10 | `GDIQD35OUW3B5VPIU2IIAFSB5XSU76YBRAI22F5U64WAURUSG6M3WKE6` | [`006c840a...aab`](https://stellar.expert/explorer/testnet/tx/006c840a169f443ece5171d2f1e1a4d86b6641ac27f2ad2c16944e2940142aab) | XLM | ✅ |
+
+> Full feedback log with UX notes: [FEEDBACK_SUMMARY.md](./FEEDBACK_SUMMARY.md)
+
+---
+
 Built with ❤️ for the Level 4 Green Belt submission.
