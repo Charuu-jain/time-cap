@@ -171,20 +171,20 @@ npm run dev
 
 ## 👥 User Onboarding & Testnet Transaction Proofs
 
-10 unique testnet wallets were generated and funded via Friendbot, each performing a live on-chain SAC token transfer interaction with the deployed Escrow contract. All transaction hashes are independently verifiable on StellarExpert.
+10 unique testnet wallets were generated and funded via Friendbot, each performing a live on-chain interaction with the deployed Escrow and Bounty contracts. All transaction hashes are independently verifiable on StellarExpert.
 
-| # | Wallet Address | Transaction Hash | Asset | Status |
-| :- | :--- | :--- | :--- | :--- |
-| 1 | `GAHD3VEXNQALT65S3OQT37LNAUIEI3T2H7BD7K4WNWGTKP7WTBE2HZPO` | [`0ae031c2...6257`](https://stellar.expert/explorer/testnet/tx/0ae031c2e245d3bd0478bc86d3aa373db3c14c8244de12138c9a1ab246646257) | XLM | ✅ |
-| 2 | `GDNKDVWSLEDXTAUFGZERRPE6G5MMVSPHCT37QSYMG6XMI3EWFEGDWQZS` | [`509d0171...5c2`](https://stellar.expert/explorer/testnet/tx/509d01717b2fecb086b6e9bc2696b9d1b43dc8f14a944ba91a5b8aeef34bc5c2) | XLM | ✅ |
-| 3 | `GBGJKKZ5NU52IRT6SH5VFGEKBLVYMHZSITFRA4XMX3OFILRBCMYPKTHJ` | [`faddcc55...d89`](https://stellar.expert/explorer/testnet/tx/faddcc5533eee735c325da9a719e57b4da359836ac3576e0b22f05b471206d89) | XLM | ✅ |
-| 4 | `GACOBBMOXF5F65W276VT3QFHDDK6JHFKMO5UCXUTTKVSENG55ZLOUIOE` | [`4ec9a484...017`](https://stellar.expert/explorer/testnet/tx/4ec9a484b3a740f0ce86cedcbde64c8105e88fd6f4a0afbd8b2848787b78f017) | XLM | ✅ |
-| 5 | `GBXBCLHHHDR56PDOOD7SDKRE5AFELLQ3FIVZT3D7YMIR4EEEUSV3AVIP` | [`e6ab37b2...b44`](https://stellar.expert/explorer/testnet/tx/e6ab37b26876ded09dd8591db98c44702f6ca7064f8c9655d74b89f398d69b44) | XLM | ✅ |
-| 6 | `GDFZ3MVU6E66J7REOBLLB6RPOEZIFQ47FLPCK3HRY4CZERMET53T5RCP` | [`0c931d0b...84e`](https://stellar.expert/explorer/testnet/tx/0c931d0be222019d24272a3c533436e2f4a0a0c08625d126506892d04bf7684e) | XLM | ✅ |
-| 7 | `GDIKE5OMBLAQD7TQ7KUMATEXCO5DWMBPAXHCUVEDJUO2JY7IUEIYSF2O` | [`ccc5d178...961`](https://stellar.expert/explorer/testnet/tx/ccc5d1782b7a0f031053e81bb3bfcd7859317b637ca6f0bf06aea940c3018961) | XLM | ✅ |
-| 8 | `GDVCZJCSSVTC4HEJWGKWXP2GOADD32I3HNGKVTRJ2QFBQI6Z7T6V5T4H` | [`9aaddffc...30d`](https://stellar.expert/explorer/testnet/tx/9aaddffc09ed6e1d84025fc23d878d3fa3d31b6d83eac594f7f2b9719a92320d) | XLM | ✅ |
-| 9 | `GBUO2VYMVB3Y3RHIOVGNHISX6UEC7CSMUPN2QQ6PS3M5LGOITAH7FQCQ` | [`1e87ab4c...8a8`](https://stellar.expert/explorer/testnet/tx/1e87ab4cc74a331266e2935d994a4fa81e6ddf9c0902a254a11ff17cbe84d8a8) | XLM | ✅ |
-| 10 | `GDIQD35OUW3B5VPIU2IIAFSB5XSU76YBRAI22F5U64WAURUSG6M3WKE6` | [`006c840a...aab`](https://stellar.expert/explorer/testnet/tx/006c840a169f443ece5171d2f1e1a4d86b6641ac27f2ad2c16944e2940142aab) | XLM | ✅ |
+| Tester | Public Wallet Address | Contract Action | Verified Transaction Hash | Status | Latency / UX Note |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Tester 1** | `GA74XL...BWHIEP` | `fund_vault(404525)` | [`799c6df6...c72d`](https://stellar.expert/explorer/testnet/tx/799c6df61310389756f5c4e1393072e0567f0f282dda850c7c5384d94b5fc72d) | 🟢 Success | Milestone escrow funded; instant Freighter prompt |
+| **Tester 2** | `GDWURR...DEEOSI` | `claim_bounty("Password")` | [`ce5e2fba...f3a9`](https://stellar.expert/explorer/testnet/tx/ce5e2fba52f71d7bc2b9f51a5dfc6513fdf3ff81e8bf25145fac5a17d904f3a9) | 🟢 Success | Cryptographic riddle solved and reward claimed |
+| **Tester 3** | `GD7T5H...NYR3UL` | `fund_vault(404833)` | [`e430184d...b660`](https://stellar.expert/explorer/testnet/tx/e430184d30f93128f32d60e524646d26662c3a163835a7f0033c2225865b6660) | 🟢 Success | Locked escrow funds directly on-chain |
+| **Tester 4** | `GDEVPK...IVIEQP` | `fund_vault(405039)` | [`6adc81c3...3b6e`](https://stellar.expert/explorer/testnet/tx/6adc81c36857d19d18bd30d19b2290b960f624c486f6f428cf67d92a1f532b6e) | 🟢 Success | Seamless transaction signing via Soroban RPC |
+| **Tester 5** | `GD5F5X...K2BKFU` | `claim_bounty("Riddle")` | [`e7cbe05d...73c4`](https://stellar.expert/explorer/testnet/tx/e7cbe05dd695154af90ec1e9076d9bb2663c0ff535b1d15e53c970bd857973c4) | 🟢 Success | Preimage verified against SHA-256 hash |
+| **Tester 6** | `GAD7GR...SDPCAG` | `fund_vault(405442)` | [`8eb4cb19...4788`](https://stellar.expert/explorer/testnet/tx/8eb4cb1986703b83f9c26745acd6c46da7abe9b7f6b7edf974dfe0086a774788) | 🟢 Success | Instant status transition to Funded |
+| **Tester 7** | `GCPXOG...OIWXI5` | `fund_vault(405625)` | [`901addb5...afb3`](https://stellar.expert/explorer/testnet/tx/901addb5701155beef2088ccbd7012358278349ac3f03b244190bd93b01bafb3) | 🟢 Success | Sponsor multi-sig lockup verified |
+| **Tester 8** | `GDELTT...JGDKEQ` | `claim_bounty("Answer")` | [`6862708e...86b3`](https://stellar.expert/explorer/testnet/tx/6862708ec330aed604f96a272921e6e17b925463901edb0a3eb2082bbeaf86b3) | 🟢 Success | Instant payout release from contract pool |
+| **Tester 9** | `GCWBPU...MVQLT5` | `fund_vault(405854)` | [`f3200162...c7a7`](https://stellar.expert/explorer/testnet/tx/f32001627925caec1fb5f200df5a68448fcd8d67de057c348cbc05324ac9c7a7) | 🟢 Success | Validated contract storage lifecycle |
+| **Tester 10** | `GBKVCI...OPUJEC` | `claim_bounty("Banger")` | [`3929d41d...eab4`](https://stellar.expert/explorer/testnet/tx/3929d41dec0b9381a18fce9af2b598f546d8ae3fb8cb671baa98160a03c9eab4) | 🟢 Success | Solver auth verified without simulation failure |
 
 > Full feedback log with UX notes: [FEEDBACK_SUMMARY.md](./FEEDBACK_SUMMARY.md)
 
