@@ -1,7 +1,26 @@
+# Hide Makefiles, lockfiles, and logs
 *Makefile linguist-detectable=false
 *makefile linguist-detectable=false
 *.mk linguist-detectable=false
-Makefile linguist-vendored
-*.mk linguist-vendored
+Makefile linguist-detectable=false
+Makefile linguist-vendored=true
+*.mk linguist-vendored=true
+*.lock linguist-vendored=true
+*.log linguist-vendored=true
+
+# Suppress JSON and lockfiles from GitHub Linguist stats
+*.json linguist-detectable=false
+*.json linguist-vendored=true
+package-lock.json linguist-vendored=true
+tsconfig*.json linguist-vendored=true
+
+# Suppress SVG assets
+*.svg linguist-detectable=false
+*.svg linguist-vendored=true
+
+# Ensure Rust and TypeScript are explicitly treated as core code
+*.rs linguist-detectable=true
+*.ts linguist-detectable=true
+*.tsx linguist-detectable=true
 frontend/** linguist-detectable=true
 contracts/** linguist-detectable=true
