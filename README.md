@@ -6,6 +6,41 @@ VaultPay empowers sponsors and builders to establish trustless, milestone-based 
 
 ---
 
+## ✅ Level 4 Green Belt Official Compliance Checklist
+
+**1. Production MVP**
+- [x] **Fully functional production MVP:** Contracts compile and all unit tests pass (`escrow_contract`, `bounty_box`, `registry`).
+- [x] **Frontend stability:** Clean `npm run build` with strict TypeScript validation.
+- [x] **Mobile responsive UI:** Fully optimized mobile views using TailwindCSS.
+- [x] **Loading states & error handling:** Comprehensive simulation guards and actionable UI notifications.
+
+**2. User Onboarding & On-Chain Proofs (10 Real Users)**
+- [x] **Proof of wallet interactions:** 10 distinct, verified testnet wallets executing authentic contract invocations (`fund_vault`, `claim_bounty`).
+- [x] **Basic user feedback collection:** Qualitative UX notes and usability metrics (92.5 SUS) documented in [FEEDBACK_SUMMARY.md](./FEEDBACK_SUMMARY.md) and [UX_FEEDBACK_ANALYSIS.md](./UX_FEEDBACK_ANALYSIS.md).
+
+**3. Product Quality & Analytics**
+- [x] **Production deployment:** Live at [https://time-cap-pink.vercel.app/](https://time-cap-pink.vercel.app/).
+- [x] **Monitoring & Analytics:** `@vercel/analytics` integrated into production application in `main.tsx`.
+- [x] **Structure & Documentation:** Clean architecture with comprehensive documentation.
+
+**4. Technical Standards**
+- [x] **Smart contracts deployed:** Escrow (`CCK7...3MCX`), Bounty Box (`CDYI...YHYU`), Registry (`CC4K...IIYA`), Native SAC (`CDLZ...YSC`) active on Testnet.
+- [x] **Commit history:** Robust version control with 90+ commits tracking iterative development.
+- [x] **Public GitHub repository:** Clean `.gitattributes` preventing Makefiles from skewing language stats.
+
+**5. Visual Artifacts (Screenshots)**
+- [x] [Product UI (Desktop)](#desktop-interface)
+- [x] [Mobile Responsive Design](#mobile-responsive-ui)
+- [x] [Analytics or Monitoring Setup](#-production-analytics--monitoring)
+- [x] [CI/CD Pipeline Passing](#green-cicd-pipeline)
+- [x] [StellarExpert Contract Verification](#stellarexpert-contract-explorer)
+
+**6. Demo Video Links**
+- [x] **Level 4 Demo:** [Watch Video (Google Drive)](https://drive.google.com/file/d/1RlNx6NwC479dBdLw0upCweQmSJXWp2Xs/view?usp=drivesdk) *(Ensure link is set to 'Anyone with the link can view')*
+- [x] **Level 3 Prototype:** [Watch Video (Google Drive)](https://drive.google.com/file/d/1EdSsFJP_vndZp4mBnFaOFu6BHXCKJ-vF/view?usp=drive_link)
+
+---
+
 ## 🔗 Important Links
 
 - **Live dApp URL:** [https://time-cap-pink.vercel.app/](https://time-cap-pink.vercel.app/)
